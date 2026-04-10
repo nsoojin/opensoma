@@ -3,12 +3,12 @@ import type { ReactNode } from 'react'
 import { cn } from '~/lib/cn'
 
 const badgeVariants = {
-  default: 'bg-muted text-foreground-muted',
-  primary: 'bg-primary-light text-primary',
-  success: 'bg-success-muted text-success-foreground',
-  danger: 'bg-danger-muted text-danger-foreground',
-  warning: 'bg-warning-muted text-warning-foreground',
-  info: 'bg-info-muted text-info-foreground',
+  default: 'bg-muted text-foreground border border-border',
+  primary: 'bg-primary-light text-primary border border-primary/20',
+  success: 'bg-success-muted text-success-foreground border border-success/20',
+  danger: 'bg-danger-muted text-danger-foreground border border-danger/20',
+  warning: 'bg-warning-muted text-warning-foreground border border-warning/20',
+  info: 'bg-info-muted text-info-foreground border border-info/20',
 } as const
 
 interface BadgeProps {
@@ -21,7 +21,7 @@ export function Badge({ variant = 'default', className, children }: BadgeProps) 
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold',
         badgeVariants[variant],
         className,
       )}

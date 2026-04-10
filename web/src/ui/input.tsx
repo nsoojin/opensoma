@@ -11,10 +11,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({ className, ...p
   <Field.Control
     ref={ref}
     className={cn(
-      'block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground shadow-sm transition-colors',
+      'block h-11 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground transition-[color,border-color] duration-[var(--transition-fast)]',
       'placeholder:text-foreground-muted',
-      'focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none',
-      'data-[invalid]:border-danger data-[invalid]:focus:ring-danger',
+      'hover:border-border-hover',
+      'focus:border-primary focus:outline-none',
+      'data-[invalid]:border-danger',
       'disabled:cursor-not-allowed disabled:opacity-50',
       className,
     )}

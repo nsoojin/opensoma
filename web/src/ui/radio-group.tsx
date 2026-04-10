@@ -35,14 +35,14 @@ export function RadioItem({ children, className, labelClassName, value, ...props
       <BaseRadio.Root
         value={value}
         className={cn(
-          'flex h-4 w-4 items-center justify-center rounded-full border border-border transition-colors',
-          'data-[checked]:border-primary data-[checked]:bg-primary',
+          'flex h-5 w-5 items-center justify-center rounded-full border border-border transition-[color,border-color,background-color] duration-[var(--transition-fast)]',
+          'data-[checked]:border-primary data-[checked]:border-[1px] data-[checked]:bg-primary',
           'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
           className,
         )}
         {...props}
       >
-        <BaseRadio.Indicator className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+        <BaseRadio.Indicator className="h-2 w-2 rounded-full bg-primary-foreground" />
       </BaseRadio.Root>
       <span>{children}</span>
     </label>

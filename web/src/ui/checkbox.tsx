@@ -20,8 +20,8 @@ export function Checkbox({ children, className, labelClassName, onCheckedChange,
     <label className={cn('flex cursor-pointer items-center gap-2 text-sm text-foreground', labelClassName)}>
       <BaseCheckbox.Root
         className={cn(
-          'flex h-4 w-4 items-center justify-center rounded border border-border transition-colors',
-          'data-[checked]:border-primary data-[checked]:bg-primary',
+          'flex h-5 w-5 items-center justify-center rounded-lg border border-border transition-[color,border-color,background-color] duration-[var(--transition-fast)]',
+          'data-[checked]:border-primary data-[checked]:border-[1px] data-[checked]:bg-primary',
           'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
           className,
         )}

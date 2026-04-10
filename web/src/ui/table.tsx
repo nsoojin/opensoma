@@ -9,7 +9,7 @@ interface TableElementProps {
 
 export function Table({ className, children }: TableElementProps) {
   return (
-    <div className="overflow-hidden rounded-lg bg-surface shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-border bg-surface">
       <table className={cn('w-full text-left text-sm', className)}>{children}</table>
     </div>
   )
@@ -24,11 +24,11 @@ export function TableBody({ className, children }: TableElementProps) {
 }
 
 export function TableRow({ className, children }: TableElementProps) {
-  return <tr className={cn('hover:bg-surface-hover', className)}>{children}</tr>
+  return <tr className={cn('hover:bg-muted/50 transition-colors', className)}>{children}</tr>
 }
 
 export function TableHead({ className, children }: TableElementProps) {
-  return <th className={cn('px-4 py-3 font-medium text-foreground-muted', className)}>{children}</th>
+  return <th className={cn('px-4 py-3 text-xs font-semibold uppercase tracking-wide text-foreground bg-muted', className)}>{children}</th>
 }
 
 export function TableCell({ className, children }: TableElementProps) {
