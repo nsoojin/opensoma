@@ -73,7 +73,7 @@ export default async function MentoringHistoryPage({
         />
       )}
 
-      <Pagination pagination={history.pagination} pathname="/mentoring/history" searchParams={{}} />
+      <Pagination pagination={history.pagination} />
     </div>
   )
 }

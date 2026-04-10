@@ -61,7 +61,7 @@ export default async function NoticePage({
         />
       )}
 
-      <Pagination pagination={notices.pagination} pathname="/notice" searchParams={{}} />
+      <Pagination pagination={notices.pagination} />
     </div>
   )
 }

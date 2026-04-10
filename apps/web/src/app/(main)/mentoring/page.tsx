@@ -108,7 +108,7 @@ export default async function MentoringPage({
         />
       )}
 
-      <Pagination pagination={mentoring.pagination} pathname="/mentoring" searchParams={{ status, type }} />
+      <Pagination pagination={mentoring.pagination} />
     </div>
   )
 }

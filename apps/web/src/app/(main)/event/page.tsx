@@ -77,7 +77,7 @@ export default async function EventPage({
         />
       )}
 
-      <Pagination pagination={events.pagination} pathname="/event" searchParams={{}} />
+      <Pagination pagination={events.pagination} />
     </div>
   )
 }
