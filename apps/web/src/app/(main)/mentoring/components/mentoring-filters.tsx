@@ -44,7 +44,7 @@ export function MentoringFilters() {
             })
           }
         >
-          MY 멘토링
+          내 멘토링
         </Checkbox>
       </div>
 
