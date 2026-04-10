@@ -39,7 +39,7 @@ export function ToggleGroupItem({ children, className, value, ...props }: Toggle
   return (
     <button
       className={cn(
-        'px-4 py-2 text-sm transition-colors [&:not(:first-child)]:border-l [&:not(:first-child)]:border-border',
+        'cursor-pointer px-4 py-2 text-sm transition-colors [&:not(:first-child)]:border-l [&:not(:first-child)]:border-border',
         selected ? 'font-semibold text-foreground' : 'text-foreground-muted hover:text-foreground',
         className,
       )}

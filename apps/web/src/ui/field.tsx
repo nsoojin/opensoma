@@ -23,7 +23,10 @@ interface FieldLabelProps extends Omit<ComponentPropsWithoutRef<typeof BaseField
 
 export function FieldLabel({ children, className, ...props }: FieldLabelProps) {
   return (
-    <BaseField.Label className={cn('block text-sm font-semibold text-foreground', className)} {...props}>
+    <BaseField.Label
+      className={cn('block cursor-pointer text-sm font-semibold text-foreground', className)}
+      {...props}
+    >
       {children}
     </BaseField.Label>
   )

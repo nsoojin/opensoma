@@ -52,10 +52,17 @@ interface CollapsiblePanelProps extends Omit<ComponentPropsWithoutRef<typeof Bas
 export function CollapsiblePanel({ children, className, ...props }: CollapsiblePanelProps) {
   return (
     <BaseCollapsible.Panel
-      className={cn('overflow-hidden border-t border-border transition-all duration-200', className)}
+      className={cn(
+        'grid overflow-hidden border-t border-border transition-[grid-template-rows] duration-200 ease-out',
+        'data-[state=closed]:grid-rows-[0fr]',
+        'data-[state=open]:grid-rows-[1fr]',
+        className,
+      )}
       {...props}
     >
-      <div className="p-4">{children}</div>
+      <div className="min-h-0 overflow-hidden">
+        <div className="p-4">{children}</div>
+      </div>
     </BaseCollapsible.Panel>
   )
 }

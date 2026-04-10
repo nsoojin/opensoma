@@ -41,7 +41,8 @@ export function MenuContent({ children, side = 'bottom', align = 'start', sideOf
         <BaseMenu.Popup
           className={cn(
             'z-50 min-w-56 overflow-hidden rounded-lg border border-border bg-surface p-1 shadow-[var(--shadow-elevation-3)] outline-none',
-            'transition-[opacity,transform] duration-150',
+            'will-change-transform',
+            'transition-all duration-100 ease-out',
             'data-[ending-style]:scale-95 data-[ending-style]:opacity-0',
             'data-[starting-style]:scale-95 data-[starting-style]:opacity-0',
             className,
