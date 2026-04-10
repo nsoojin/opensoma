@@ -2,7 +2,10 @@
 
 import { redirect } from 'next/navigation'
 
+import { venueToRoomId } from '@/app/(main)/room/lib/room-mentoring'
+import { performRoomReservation } from '@/lib/actions/reserve-room'
 import { createClient } from '@/lib/client'
+import type { RoomCard } from '@/lib/sdk'
 
 interface CreateMentoringState {
   error: string
@@ -50,4 +53,52 @@ export async function createMentoring(
   }
 
   redirect('/mentoring')
+}
+
+export async function fetchRoomAvailability(
+  date: string,
+  venue: string,
+): Promise<{ slots: Array<{ time: string; available: boolean }> } | { error: string }> {
+  const roomId = venueToRoomId(venue)
+
+  if (!roomId) {
+    return { error: '예약할 수 없는 장소입니다.' }
+  }
+
+  if (!date) {
+    return { error: '날짜를 선택해주세요.' }
+  }
+
+  try {
+    const client = await createClient()
+    const slots = await client.room.available(roomId, date)
+    return { slots }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : '회의실 정보를 불러오지 못했습니다.' }
+  }
+}
+
+export async function fetchRooms(date: string, room?: string): Promise<RoomCard[]> {
+  const client = await createClient()
+  return client.room.list({ date, room: room || undefined })
+}
+
+export async function reserveRoomFromMentoring(params: {
+  venue: string
+  date: string
+  slots: string[]
+  title: string
+}): Promise<{ error: string; success: string }> {
+  const roomId = venueToRoomId(params.venue)
+
+  if (!roomId) {
+    return { error: '예약할 수 없는 장소입니다.', success: '' }
+  }
+
+  return performRoomReservation({
+    roomId,
+    date: params.date,
+    slots: params.slots,
+    title: params.title,
+  })
 }
