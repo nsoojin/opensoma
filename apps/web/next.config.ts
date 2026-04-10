@@ -7,7 +7,10 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const nextConfig: NextConfig = {
   experimental: { externalDir: true },
-  outputFileTracingRoot: path.resolve(dirname, '..'),
+  outputFileTracingRoot: path.resolve(dirname, '../..'),
+  turbopack: {
+    root: path.resolve(dirname, '../..'),
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
