@@ -4,6 +4,7 @@ import { ChalkboardTeacher } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 
 import { MentoringFilters } from '~/app/(main)/mentoring/components/mentoring-filters'
+import { parseSearchQuery } from '@/shared/utils/mentoring-params'
 import { Pagination } from '~/components/pagination'
 import { StatusBadge } from '~/components/status-badge'
 import { requireAuth } from '~/lib/auth'
@@ -25,8 +26,10 @@ export default async function MentoringPage({
   const page = Number(getFirstValue(resolvedSearchParams.page) ?? '1') || 1
   const status = getFirstValue(resolvedSearchParams.status) ?? undefined
   const type = getFirstValue(resolvedSearchParams.type) ?? undefined
+  const searchRaw = getFirstValue(resolvedSearchParams.search)
+  const search = searchRaw ? parseSearchQuery(searchRaw) : undefined
   const client = await requireAuth()
-  const mentoring = await client.mentoring.list({ page, status, type })
+  const mentoring = await client.mentoring.list({ page, status, type, search })
 
   return (
     <div className="space-y-6">

@@ -2,18 +2,14 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import { Button } from '~/ui/button'
+import { ToggleGroup, ToggleGroupItem } from '~/ui/toggle-group'
 
-const statusFilters = [
-  { label: '전체', value: '' },
-  { label: '접수중', value: 'open' },
-  { label: '마감', value: 'closed' },
-]
+const MINE = 'mine'
 
 const typeFilters = [
-  { label: '전체', value: '' },
-  { label: '자유 멘토링', value: 'free' },
-  { label: '멘토 특강', value: 'lecture' },
+  { label: '전체', value: '', color: 'bg-foreground-muted' },
+  { label: '멘토특강', value: 'lecture', color: 'bg-amber-500' },
+  { label: '자유멘토링', value: 'free', color: 'bg-emerald-500' },
 ]
 
 export function MentoringFilters() {
@@ -22,52 +18,44 @@ export function MentoringFilters() {
   const searchParams = useSearchParams()
   const currentStatus = searchParams.get('status') ?? ''
   const currentType = searchParams.get('type') ?? ''
+  const isMine = searchParams.get('search') === 'author:@me'
+
+  const statusValue = isMine ? MINE : currentStatus
+
+  const handleStatusChange = (value: string) => {
+    if (value === MINE) {
+      updateSearchParams({ pathname, router, searchParams, updates: { search: 'author:@me', page: '' } })
+    } else {
+      updateSearchParams({ pathname, router, searchParams, updates: { status: value, search: '', page: '' } })
+    }
+  }
 
   return (
-    <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border bg-surface p-4">
-      <FilterGroup
-        currentValue={currentStatus}
-        items={statusFilters}
-        label="상태"
-        onSelect={(value) =>
-          updateSearchParams({ pathname, router, searchParams, updates: { status: value, page: '' } })
-        }
-      />
-      <FilterGroup
-        currentValue={currentType}
-        items={typeFilters}
-        label="유형"
-        onSelect={(value) => updateSearchParams({ pathname, router, searchParams, updates: { type: value, page: '' } })}
-      />
-    </div>
-  )
-}
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <ToggleGroup value={statusValue} onValueChange={handleStatusChange}>
+        <ToggleGroupItem value="">전체</ToggleGroupItem>
+        <ToggleGroupItem value="open">접수중</ToggleGroupItem>
+        <ToggleGroupItem value="closed">마감</ToggleGroupItem>
+        <ToggleGroupItem value={MINE}>MY 멘토링</ToggleGroupItem>
+      </ToggleGroup>
 
-function FilterGroup({
-  label,
-  items,
-  currentValue,
-  onSelect,
-}: {
-  label: string
-  items: Array<{ label: string; value: string }>
-  currentValue: string
-  onSelect: (value: string) => void
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <p className="shrink-0 text-sm font-medium text-foreground">{label}</p>
-      <div className="flex flex-wrap gap-1.5">
-        {items.map((item) => (
-          <Button
-            key={`${label}-${item.value}`}
-            size="sm"
+      <div className="flex items-center gap-4">
+        {typeFilters.map((item) => (
+          <button
+            key={item.value}
+            className={`flex items-center gap-1.5 text-sm transition-colors ${
+              currentType === item.value
+                ? 'font-semibold text-foreground'
+                : 'text-foreground-muted hover:text-foreground'
+            }`}
             type="button"
-            variant={currentValue === item.value ? 'primary' : 'ghost'}
-            onClick={() => onSelect(item.value)}
+            onClick={() =>
+              updateSearchParams({ pathname, router, searchParams, updates: { type: item.value, page: '' } })
+            }
           >
+            <span className={`inline-block size-2.5 rounded-full ${item.color}`} />
             {item.label}
-          </Button>
+          </button>
         ))}
       </div>
     </div>
