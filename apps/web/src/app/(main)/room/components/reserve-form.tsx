@@ -1,8 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState } from 'react'
 
 import { reserveRoom } from '@/app/(main)/room/actions'
+import { buildMentoringCreateUrl, roomToMentoringParams } from '@/app/(main)/room/lib/room-mentoring'
 import { Button } from '@/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/ui/field'
 import { Input } from '@/ui/input'
@@ -50,11 +52,21 @@ export function ReserveForm({ roomId, roomName, date, selectedSlots }: ReserveFo
       </Field>
 
       {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
-      {state.success ? <p className="text-sm text-success-foreground">{state.success}</p> : null}
 
-      <Button disabled={isPending} type="submit">
-        {isPending ? '예약 중...' : '예약하기'}
-      </Button>
+      {state.success ? (
+        <div className="space-y-3">
+          <p className="text-sm text-success-foreground">{state.success}</p>
+          <Link href={buildMentoringCreateUrl(roomToMentoringParams({ date, roomName, selectedSlots }))}>
+            <Button type="button" variant="secondary">
+              멘토링/특강 등록하기 →
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <Button disabled={isPending} type="submit">
+          {isPending ? '예약 중...' : '예약하기'}
+        </Button>
+      )}
     </form>
   )
 }
