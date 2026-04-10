@@ -1,7 +1,7 @@
 ---
 name: opensoma
 description: Interact with SWMaestro MyPage - manage mentoring sessions, reserve meeting rooms, view dashboard, team info, notices, and member profiles
-version: 0.1.1
+version: 0.1.2
 allowed-tools: Bash(opensoma:*)
 metadata:
   openclaw:
