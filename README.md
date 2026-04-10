@@ -65,6 +65,11 @@ opensoma dashboard show
 opensoma mentoring list
 opensoma mentoring list --status open --type free --page 2
 
+# 검색
+opensoma mentoring list --search "OpenCode"
+opensoma mentoring list --search "author:@me"
+opensoma mentoring list --search "author:@me" --status open --type lecture
+
 # 상세 조회
 opensoma mentoring get <id>
 

@@ -14,9 +14,10 @@ async function showAction(options: ShowOptions): Promise<void> {
   try {
     const http = await getHttpOrExit()
     const user = (await http.checkLogin()) ?? undefined
+    const search = { field: 'author' as const, value: '@me', me: true }
     const [dashboardHtml, mentoringHtml] = await Promise.all([
       http.get('/mypage/myMain/dashboard.do', { menuNo: MENU_NO.DASHBOARD }),
-      http.get('/mypage/mentoLec/list.do', buildMentoringListParams({ status: 'my', user })),
+      http.get('/mypage/mentoLec/list.do', buildMentoringListParams({ search, user })),
     ])
     const dashboard = formatters.parseDashboard(dashboardHtml)
     const myMentoring = formatters.parseMentoringList(mentoringHtml)

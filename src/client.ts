@@ -2,7 +2,7 @@ import { MENU_NO } from '@/constants'
 import { CredentialManager } from '@/credential-manager'
 import * as formatters from '@/formatters'
 import { type UserIdentity, SomaHttp } from '@/http'
-import { buildMentoringListParams } from '@/shared/utils/mentoring-params'
+import { type MentoringSearchQuery, buildMentoringListParams } from '@/shared/utils/mentoring-params'
 import {
   buildApplicationPayload,
   buildCancelApplicationPayload,
@@ -41,6 +41,7 @@ export class SomaClient {
     list(options?: {
       status?: string
       type?: string
+      search?: MentoringSearchQuery
       page?: number
     }): Promise<{ items: MentoringListItem[]; pagination: Pagination }>
     get(id: number): Promise<MentoringDetail>
@@ -104,13 +105,14 @@ export class SomaClient {
 
     this.mentoring = {
       list: async (options) => {
-        const user = options?.status === 'my' ? await this.resolveUser() : undefined
+        const user = options?.search?.me ? await this.resolveUser() : undefined
         const html = await this.http.get(
           '/mypage/mentoLec/list.do',
           buildMentoringListParams({
             status: options?.status,
             type: options?.type,
             page: options?.page,
+            search: options?.search,
             user,
           }),
         )
@@ -168,7 +170,7 @@ export class SomaClient {
       get: async () => {
         const [dashboard, { items: myMentoring }] = await Promise.all([
           formatters.parseDashboard(await this.http.get('/mypage/myMain/dashboard.do', { menuNo: MENU_NO.DASHBOARD })),
-          this.mentoring.list({ status: 'my' }),
+          this.mentoring.list({ search: { field: 'author', value: '@me', me: true } }),
         ])
         dashboard.mentoringSessions = myMentoring.map((item) => ({
           title: item.title,

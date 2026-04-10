@@ -33,7 +33,7 @@ describe('SomaClient', () => {
       {
         method: 'get',
         path: '/mypage/mentoLec/list.do',
-        data: { menuNo: MENU_NO.MENTORING, searchStatMentolec: 'open', searchGubunMentolec: 'free', pageIndex: '2' },
+        data: { menuNo: MENU_NO.MENTORING, searchStatMentolec: 'A', searchGubunMentolec: 'MRC010', pageIndex: '2' },
       },
     ])
     expect(result.items[0]?.title).toBe('제목')

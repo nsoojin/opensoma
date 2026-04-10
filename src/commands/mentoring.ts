@@ -12,9 +12,9 @@ import {
 } from '@/shared/utils/swmaestro'
 
 import { getHttpOrExit } from './helpers'
-import { buildMentoringListParams } from '@/shared/utils/mentoring-params'
+import { buildMentoringListParams, parseSearchQuery } from '@/shared/utils/mentoring-params'
 
-type ListOptions = { status?: string; type?: string; page?: string; pretty?: boolean }
+type ListOptions = { status?: string; type?: string; search?: string; page?: string; pretty?: boolean }
 type GetOptions = { pretty?: boolean }
 type CreateOptions = {
   title: string
@@ -35,11 +35,13 @@ type HistoryOptions = { page?: string; pretty?: boolean }
 async function listAction(options: ListOptions): Promise<void> {
   try {
     const http = await getHttpOrExit()
-    const user = options.status === 'my' ? (await http.checkLogin()) ?? undefined : undefined
+    const search = options.search ? parseSearchQuery(options.search) : undefined
+    const user = search?.me ? (await http.checkLogin()) ?? undefined : undefined
     const html = await http.get('/mypage/mentoLec/list.do', buildMentoringListParams({
       status: options.status,
       type: options.type,
       page: options.page,
+      search,
       user,
     }))
     console.log(
@@ -146,8 +148,9 @@ export const mentoringCommand = new Command('mentoring')
   .addCommand(
     new Command('list')
       .description('List mentoring sessions')
-      .option('--status <status>', 'Status filter (open|closed|my)')
+      .option('--status <status>', 'Status filter (open|closed)')
       .option('--type <type>', 'Type filter (free|lecture)')
+      .option('--search <query>', 'Search (e.g. "keyword", "author:@me", "content:text")')
       .option('--page <n>', 'Page number')
       .option('--pretty', 'Pretty print JSON output')
       .action(listAction),

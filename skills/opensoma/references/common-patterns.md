@@ -47,14 +47,33 @@ opensoma mentoring create \
 
 ## Listing My Mentoring Sessions
 
-When the user asks "show my lectures", "list my mentoring", "내 멘토링", or any variation of viewing sessions they created, use `--status my`. This filters to only the sessions authored by the current user.
+When the user asks "show my lectures", "list my mentoring", "내 멘토링", or any variation of viewing sessions they created, use `--search "author:@me"`. This filters to only the sessions authored by the current user.
 
 ```bash
 # List mentoring sessions I created
-opensoma mentoring list --status my --pretty
+opensoma mentoring list --search "author:@me" --pretty
 
-# Combine with type filter to see only my lectures
-opensoma mentoring list --status my --type lecture --pretty
+# Combine with status and type filters
+opensoma mentoring list --search "author:@me" --status open --pretty
+opensoma mentoring list --search "author:@me" --type lecture --pretty
+```
+
+## Searching Mentoring Sessions
+
+Use `--search` to find mentoring sessions by title, author, or content. Title search is the default when no field prefix is given.
+
+```bash
+# Search by title (default)
+opensoma mentoring list --search "OpenCode" --pretty
+
+# Search by author name
+opensoma mentoring list --search "author:전수열" --pretty
+
+# Search by content
+opensoma mentoring list --search "content:하네스" --pretty
+
+# Compose search with other filters
+opensoma mentoring list --search "OpenCode" --status open --type lecture --pretty
 ```
 
 ## Checking a Specific Mentoring Session
