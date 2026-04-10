@@ -66,7 +66,7 @@ describe('buildMentoringCreateUrl', () => {
         venue: '스페이스 A1',
       }),
     ).toBe(
-      '/mentoring/create?date=2025-01-15&startTime=14%3A00&endTime=15%3A30&venue=%EC%8A%A4%ED%8E%98%EC%9D%B4%EC%8A%A4+A1',
+      '/mentoring/new?date=2025-01-15&startTime=14%3A00&endTime=15%3A30&venue=%EC%8A%A4%ED%8E%98%EC%9D%B4%EC%8A%A4+A1',
     )
   })
 
@@ -78,7 +78,7 @@ describe('buildMentoringCreateUrl', () => {
         endTime: '15:30',
         venue: '',
       }),
-    ).toBe('/mentoring/create?date=2025-01-15&endTime=15%3A30')
+    ).toBe('/mentoring/new?date=2025-01-15&endTime=15%3A30')
   })
 })
 

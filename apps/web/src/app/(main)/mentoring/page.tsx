@@ -75,7 +75,7 @@ export default async function MentoringPage({
               신청 내역
             </Button>
           </form>
-          <form action="/mentoring/create">
+          <form action="/mentoring/new">
             <Button type="submit">글쓰기</Button>
           </form>
         </div>

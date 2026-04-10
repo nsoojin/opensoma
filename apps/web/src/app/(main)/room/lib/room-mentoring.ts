@@ -54,7 +54,7 @@ export function buildMentoringCreateUrl(params: RoomToMentoringParams): string {
 
   const query = searchParams.toString()
 
-  return query ? `/mentoring/create?${query}` : '/mentoring/create'
+  return query ? `/mentoring/new?${query}` : '/mentoring/new'
 }
 
 export function venueToRoomCode(venue: string): string | null {

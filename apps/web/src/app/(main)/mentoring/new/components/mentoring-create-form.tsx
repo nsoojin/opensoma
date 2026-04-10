@@ -2,11 +2,11 @@
 
 import { useActionState, useRef, useState, useTransition } from 'react'
 
-import { createMentoring, reserveRoomFromMentoring } from '@/app/(main)/mentoring/create/actions'
+import { createMentoring, reserveRoomFromMentoring } from '@/app/(main)/mentoring/new/actions'
 import {
   MentoringRoomTimeline,
   type TimelineSelection,
-} from '@/app/(main)/mentoring/create/components/mentoring-room-timeline'
+} from '@/app/(main)/mentoring/new/components/mentoring-room-timeline'
 import { addThirtyMinutes } from '@/app/(main)/room/lib/room-mentoring'
 import type { RoomCard } from '@/lib/sdk'
 import { Button } from '@/ui/button'

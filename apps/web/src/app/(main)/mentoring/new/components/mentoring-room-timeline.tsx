@@ -3,7 +3,7 @@
 import { CalendarBlank } from '@phosphor-icons/react'
 import { useMemo, useState, useTransition } from 'react'
 
-import { fetchRooms } from '@/app/(main)/mentoring/create/actions'
+import { fetchRooms } from '@/app/(main)/mentoring/new/actions'
 import { addThirtyMinutes } from '@/app/(main)/room/lib/room-mentoring'
 import { cn } from '@/lib/cn'
 import type { RoomCard } from '@/lib/sdk'

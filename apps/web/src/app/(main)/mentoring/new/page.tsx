@@ -1,4 +1,4 @@
-import { MentoringCreateForm } from '@/app/(main)/mentoring/create/components/mentoring-create-form'
+import { MentoringCreateForm } from '@/app/(main)/mentoring/new/components/mentoring-create-form'
 import { requireAuth } from '@/lib/auth'
 
 export default async function MentoringCreatePage({
