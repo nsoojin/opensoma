@@ -4,6 +4,9 @@
 
 AI 에이전트가 SWMaestro 플랫폼과 상호작용할 수 있도록 설계되었습니다. 모든 출력은 JSON 형식입니다.
 
+> [!TIP]
+> Webex도 자동화하고 싶으신가요? [agent-messenger](https://github.com/agent-messenger/agent-messenger)를 사용해 보세요.
+
 ## 설치
 
 ```bash
