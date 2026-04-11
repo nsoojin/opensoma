@@ -11,8 +11,10 @@
   "scripts": {
     "build": "bun run --filter '*' build",
     "typecheck": "bun run --filter '*' typecheck",
-    "lint": "bun run --filter '*' lint",
-    "format": "bun run --filter '*' format",
+    "lint": "bunx oxlint .",
+    "lint:fix": "bunx oxlint . --fix",
+    "format": "bunx oxfmt .",
+    "format:check": "bunx oxfmt . --check",
     "dev:web": "bun run --cwd apps/web dev",
     "test": "bun run --filter '*' test",
     "link": "bun link --cwd packages/opensoma",

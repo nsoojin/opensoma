@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 120,
+  "useTabs": false,
+  "semi": false,
+  "singleQuote": true,
+  "sortImports": {},
+  "ignorePatterns": ["*.md", "**/.next/**", "**/next-env.d.ts", ".github", ".claude-plugin"],
+  "overrides": [
+    {
+      "files": ["apps/web/**"],
+      "options": {
+        "printWidth": 120,
+        "sortTailwindcss": {
+          "stylesheet": "apps/web/src/app/globals.css",
+          "functions": ["cn", "clsx", "cva"]
+        }
+      }
+    }
+  ]
+}
