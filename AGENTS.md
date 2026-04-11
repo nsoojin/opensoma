@@ -6,6 +6,8 @@ SWMaestro MyPage CLI & SDK for AI agents. Wraps the SWMaestro platform (swmaestr
 
 Runtime: Bun for development, Node.js-compatible output for npm distribution.
 
+**Monorepo Structure**: The publishable npm package is at `packages/opensoma/`. The root is `opensoma-monorepo` (private) and contains the web app at `apps/web/`.
+
 ## Commands
 
 ```bash
@@ -62,11 +64,25 @@ npm consumers run compiled JS via Node.js. The `prepublishOnly` script runs the 
 
 To publish a new version to npm:
 
-1. Bump version in `package.json`
+1. Bump version in `packages/opensoma/package.json`
 2. Run `bun run build` to verify the build succeeds
-3. Run `npm publish` (triggers `prepublishOnly` → build + rewrite bin paths, then `postpublish` → restore `package.json`)
+3. Run `npm publish` from `packages/opensoma/` directory (triggers `prepublishOnly` → build + rewrite bin paths, then `postpublish` → restore `package.json`)
+
+```bash
+cd packages/opensoma
+npm publish
+```
 
 Tags have no `v` prefix.
+
+### First-time Publish
+
+If the package doesn't exist on npm yet, use:
+
+```bash
+cd packages/opensoma
+npm publish --access public
+```
 
 ### Version Decision
 

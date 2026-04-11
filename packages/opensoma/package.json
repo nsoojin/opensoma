@@ -1,6 +1,6 @@
 {
   "name": "opensoma",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "SWMaestro MyPage CLI & SDK for AI agents",
   "license": "MIT",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "git+https://github.com/devxoul/opensoma.git"
   },
   "bin": {
-    "opensoma": "./src/cli.ts"
+    "opensoma": "dist/src/cli.js"
   },
   "type": "module",
   "main": "dist/src/index.js",
