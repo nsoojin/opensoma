@@ -60,7 +60,7 @@ export default async function MentoringDetailPage({ params }: PageProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-8">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-x-8 gap-y-0 md:grid-cols-2">
             <MetaItem label="장소" value={mentoring.venue || '-'} />
             <MetaItem
               label="접수 기간"
@@ -94,9 +94,9 @@ export default async function MentoringDetailPage({ params }: PageProps) {
 
 function MetaItem({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-lg bg-muted p-4">
-      <p className="text-sm text-foreground-muted">{label}</p>
-      <p className="mt-1 text-sm font-medium text-foreground">{value}</p>
+    <div className="flex items-center gap-3 py-2">
+      <span className="text-xs text-foreground-muted shrink-0 w-16">{label}</span>
+      <span className="text-sm text-foreground">{value}</span>
     </div>
   )
 }
