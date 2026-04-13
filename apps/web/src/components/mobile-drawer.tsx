@@ -89,7 +89,8 @@ export function MobileDrawer({ username }: MobileDrawerProps) {
         </div>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-4">
           {navItems.map((item, index) => {
-            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+            const itemPathname = item.href.split('?')[0]
+            const isActive = itemPathname === '/' ? pathname === '/' : pathname.startsWith(itemPathname)
             const IconComponent = item.icon
 
             return (

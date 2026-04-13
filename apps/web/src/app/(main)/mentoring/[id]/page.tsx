@@ -95,7 +95,7 @@ export default async function MentoringDetailPage({ params }: PageProps) {
 function MetaItem({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 py-2">
-      <span className="text-xs text-foreground-muted shrink-0 w-16">{label}</span>
+      <span className="w-16 shrink-0 text-xs text-foreground-muted">{label}</span>
       <span className="text-sm text-foreground">{value}</span>
     </div>
   )

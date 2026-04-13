@@ -48,7 +48,8 @@ export function Sidebar({ username }: SidebarProps) {
 
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
           {navItems.map((item) => {
-            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+            const itemPathname = item.href.split('?')[0]
+            const isActive = itemPathname === '/' ? pathname === '/' : pathname.startsWith(itemPathname)
             const IconComponent = item.icon
             const linkClassName = cn(
               'flex items-center overflow-hidden rounded-lg py-2 text-sm font-semibold transition-colors focus:outline-none',
