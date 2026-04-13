@@ -2,6 +2,7 @@ import { Command } from 'commander'
 
 import { CredentialManager } from '../credential-manager'
 import { SomaHttp } from '../http'
+import { recoverSession } from '../session-recovery'
 import { handleError } from '../shared/utils/error-handler'
 import { formatOutput } from '../shared/utils/output'
 import type { ExtractedSessionCandidate } from '../token-extractor'
@@ -10,8 +11,9 @@ type LoginOptions = { username?: string; password?: string; pretty?: boolean }
 type StatusOptions = { pretty?: boolean }
 type ExtractOptions = { pretty?: boolean }
 type ExtractedSessionValidator = Pick<SomaHttp, 'checkLogin' | 'extractCsrfToken'>
-type CredentialStore = Pick<CredentialManager, 'getCredentials' | 'remove'>
+type CredentialStore = Pick<CredentialManager, 'getCredentials' | 'remove' | 'setCredentials'>
 type StatusValidator = Pick<SomaHttp, 'checkLogin'>
+type ReloginHttp = Pick<SomaHttp, 'checkLogin' | 'getCsrfToken' | 'getSessionCookie' | 'login'>
 
 const EXPIRED_SESSION_HINT = 'Session expired. Run: opensoma auth login or opensoma auth extract'
 const UNVERIFIED_SESSION_HINT = 'Could not verify session. Try again or run: opensoma auth login or opensoma auth extract'
@@ -70,6 +72,7 @@ async function loginAction(options: LoginOptions): Promise<void> {
       sessionCookie,
       csrfToken,
       username,
+      password,
       loggedInAt: new Date().toISOString(),
     })
 
@@ -105,6 +108,7 @@ export async function inspectStoredAuthStatus(
   manager: CredentialStore = new CredentialManager(),
   createValidator: (credentials: { sessionCookie: string; csrfToken: string }) => StatusValidator = (credentials) =>
     new SomaHttp({ sessionCookie: credentials.sessionCookie, csrfToken: credentials.csrfToken }),
+  createReloginHttp: () => ReloginHttp = () => new SomaHttp(),
 ): Promise<Record<string, boolean | null | string>> {
   const creds = await manager.getCredentials()
   if (!creds) {
@@ -125,6 +129,26 @@ export async function inspectStoredAuthStatus(
   }
 
   if (!identity) {
+    try {
+      const refreshedCredentials = await recoverSession(creds, manager, createReloginHttp)
+      if (refreshedCredentials) {
+        return {
+          authenticated: true,
+          valid: true,
+          username: refreshedCredentials.username ?? null,
+          loggedInAt: refreshedCredentials.loggedInAt ?? null,
+        }
+      }
+    } catch {
+      return {
+        authenticated: true,
+        valid: false,
+        username: creds.username ?? null,
+        loggedInAt: creds.loggedInAt ?? null,
+        hint: UNVERIFIED_SESSION_HINT,
+      }
+    }
+
     await manager.remove()
     return {
       authenticated: false,

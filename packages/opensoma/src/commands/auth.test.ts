@@ -65,6 +65,9 @@ describe('inspectStoredAuthStatus', () => {
           csrfToken: 'csrf-token',
           username: 'neo@example.com',
         }),
+        setCredentials: async () => {
+          throw new Error('should not save unrecoverable credentials')
+        },
         remove: async () => {
           removed = true
         },
@@ -94,6 +97,9 @@ describe('inspectStoredAuthStatus', () => {
           username: 'neo@example.com',
           loggedInAt: '2026-04-13T00:00:00.000Z',
         }),
+        setCredentials: async () => {
+          throw new Error('should not rewrite credentials when verification fails')
+        },
         remove: async () => {
           removed = true
         },
@@ -113,5 +119,49 @@ describe('inspectStoredAuthStatus', () => {
       hint: 'Could not verify session. Try again or run: opensoma auth login or opensoma auth extract',
     })
     expect(removed).toBe(false)
+  })
+
+  test('refreshes the session automatically when encrypted login credentials are available', async () => {
+    let savedCredentials: Record<string, string> | null = null
+
+    const status = await inspectStoredAuthStatus(
+      {
+        getCredentials: async () => ({
+          sessionCookie: 'stale-session',
+          csrfToken: 'stale-csrf',
+          username: 'neo@example.com',
+          password: 'secret',
+          loggedInAt: '2026-04-13T00:00:00.000Z',
+        }),
+        setCredentials: async (credentials: Record<string, string>) => {
+          savedCredentials = credentials
+        },
+        remove: async () => {
+          throw new Error('should not remove recoverable credentials')
+        },
+      },
+      () => ({
+        checkLogin: async () => null,
+      }),
+      () => ({
+        login: async () => {},
+        checkLogin: async () => ({ userId: 'neo@example.com', userNm: 'Neo' }),
+        getSessionCookie: () => 'fresh-session',
+        getCsrfToken: () => 'fresh-csrf',
+      }),
+    )
+
+    expect(status).toEqual({
+      authenticated: true,
+      valid: true,
+      username: 'neo@example.com',
+      loggedInAt: expect.any(String),
+    })
+    expect(savedCredentials).toMatchObject({
+      sessionCookie: 'fresh-session',
+      csrfToken: 'fresh-csrf',
+      username: 'neo@example.com',
+      password: 'secret',
+    })
   })
 })
