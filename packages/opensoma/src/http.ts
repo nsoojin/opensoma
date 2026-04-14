@@ -134,6 +134,75 @@ export class SomaHttp {
     return finalBody
   }
 
+  async postMultipart(path: string, formData: FormData): Promise<string> {
+    const url = this.buildUrl(path)
+
+    if (this.csrfToken) {
+      formData.append('csrfToken', this.csrfToken)
+    }
+
+    let response = await fetch(url, {
+      method: 'POST',
+      headers: this.buildMultipartHeaders(url),
+      body: formData,
+      redirect: 'manual',
+    })
+
+    this.updateFromResponse(response)
+
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location')
+      const intermediateBody = await response.clone().text()
+      const errorInfo = this.extractErrorFromResponse(intermediateBody, location, path)
+      if (errorInfo) {
+        if (errorInfo === '__AUTH_ERROR__') {
+          throw new AuthenticationError()
+        }
+        throw new Error(errorInfo)
+      }
+    }
+
+    let finalUrl = url
+    while (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location')
+      if (!location) break
+
+      const redirectUrl = location.startsWith('http') ? location : new URL(location, `${BASE_URL}/`).toString()
+      finalUrl = redirectUrl
+      response = await fetch(redirectUrl, {
+        method: 'GET',
+        headers: this.buildHeaders(),
+        redirect: 'manual',
+      })
+      this.updateFromResponse(response)
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const finalBody = await response.text()
+    this.log('POST MULTIPART', path, '-> Final URL:', finalUrl)
+    this.log('POST MULTIPART', path, '-> Response body (first 200 chars):', finalBody.slice(0, 200))
+
+    const finalPath = new URL(finalUrl).pathname
+    const errorInfo = this.extractErrorFromResponse(finalBody, null, finalPath)
+    if (errorInfo) {
+      this.log('POST MULTIPART', path, '-> Error detected:', errorInfo)
+      if (errorInfo === '__AUTH_ERROR__') {
+        throw new AuthenticationError()
+      }
+      throw new Error(errorInfo)
+    }
+
+    if (finalPath.includes('insertForm') || finalPath.includes('error') || finalPath.includes('fail')) {
+      this.log('POST MULTIPART', path, '-> Suspicious final URL:', finalUrl)
+      throw new Error('멘토링 등록에 실패했습니다.')
+    }
+
+    return finalBody
+  }
+
   private extractErrorFromResponse(body: string, location: string | null, path?: string): string | null {
     this.log(
       'extractErrorFromResponse',
@@ -340,6 +409,13 @@ export class SomaHttp {
       'Accept-Language': DEFAULT_ACCEPT_LANGUAGE,
       'User-Agent': DEFAULT_USER_AGENT,
       ...(cookieHeader ? { cookie: cookieHeader } : {}),
+    }
+  }
+
+  private buildMultipartHeaders(referer: string): Record<string, string> {
+    return {
+      ...this.buildHeaders(),
+      Referer: referer,
     }
   }
 

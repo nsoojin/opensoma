@@ -52,6 +52,110 @@ describe('SomaHttp', () => {
     expect(html).toBe('<html>ok</html>')
   })
 
+  describe('postMultipart', () => {
+    test('passes FormData to fetch', async () => {
+      const fetchMock = mock(async (_input: RequestInfo | URL, init?: RequestInit) => {
+        expect(init?.body).toBeInstanceOf(FormData)
+        return createResponse('<html>ok</html>')
+      })
+      globalThis.fetch = fetchMock as typeof fetch
+
+      const http = new SomaHttp({ sessionCookie: 'session-1', csrfToken: 'csrf-1' })
+
+      await expect(http.postMultipart('/test', new FormData())).resolves.toBe('<html>ok</html>')
+    })
+
+    test('does not set Content-Type manually', async () => {
+      const fetchMock = mock(async (_input: RequestInfo | URL, init?: RequestInit) => {
+        expect(init?.headers).toEqual({
+          'Accept-Language': 'ko,en-US;q=0.9,en;q=0.8',
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
+          cookie: 'JSESSIONID=session-1',
+          Referer: 'https://www.swmaestro.ai/sw/test',
+        })
+        expect((init?.headers as Record<string, string>)['Content-Type']).toBeUndefined()
+        expect((init?.headers as Record<string, string>)['content-type']).toBeUndefined()
+        return createResponse('<html>ok</html>')
+      })
+      globalThis.fetch = fetchMock as typeof fetch
+
+      const http = new SomaHttp({ sessionCookie: 'session-1', csrfToken: 'csrf-1' })
+
+      await http.postMultipart('/test', new FormData())
+    })
+
+    test('appends csrf token to FormData', async () => {
+      const fetchMock = mock(async (_input: RequestInfo | URL, init?: RequestInit) => {
+        const body = init?.body
+        expect(body).toBeInstanceOf(FormData)
+        expect((body as FormData).get('csrfToken')).toBe('csrf-known')
+        return createResponse('<html>ok</html>')
+      })
+      globalThis.fetch = fetchMock as typeof fetch
+
+      const http = new SomaHttp({ csrfToken: 'csrf-known' })
+
+      await http.postMultipart('/test', new FormData())
+    })
+
+    test('follows redirects manually', async () => {
+      const fetchMock = mock(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+
+        if (url === 'https://www.swmaestro.ai/sw/test') {
+          expect(init).toMatchObject({
+            method: 'POST',
+            redirect: 'manual',
+          })
+          return createResponse('', [], 'text/html', {
+            status: 302,
+            headers: { Location: '/mypage/mentoLec/result.do' },
+          })
+        }
+
+        expect(url).toBe('https://www.swmaestro.ai/mypage/mentoLec/result.do')
+        expect(init).toEqual({
+          method: 'GET',
+          redirect: 'manual',
+          headers: {
+            'Accept-Language': 'ko,en-US;q=0.9,en;q=0.8',
+            'User-Agent':
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
+            cookie: 'JSESSIONID=session-1',
+          },
+        })
+        return createResponse('<html>redirected</html>')
+      })
+      globalThis.fetch = fetchMock as typeof fetch
+
+      const http = new SomaHttp({ sessionCookie: 'session-1', csrfToken: 'csrf-1' })
+
+      await expect(http.postMultipart('/test', new FormData())).resolves.toBe('<html>redirected</html>')
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+
+    test('keeps existing post() behavior unchanged', async () => {
+      const fetchMock = mock(async (_input: RequestInfo | URL, init?: RequestInit) => {
+        expect(init?.method).toBe('POST')
+        expect(init?.headers).toEqual({
+          'Accept-Language': 'ko,en-US;q=0.9,en;q=0.8',
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
+          cookie: 'JSESSIONID=session-1',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        })
+        expect(init?.body).toBe('title=%ED%85%8C%EC%8A%A4%ED%8A%B8&csrfToken=csrf-1')
+        return createResponse('<html>ok</html>')
+      })
+      globalThis.fetch = fetchMock as typeof fetch
+
+      const http = new SomaHttp({ sessionCookie: 'session-1', csrfToken: 'csrf-1' })
+
+      await expect(http.post('/mypage/mentoLec/insert.do', { title: '테스트' })).resolves.toBe('<html>ok</html>')
+    })
+  })
+
   test('postJson returns parsed json', async () => {
     const fetchMock = mock(async (_input: RequestInfo | URL, init?: RequestInit) => {
       expect(init?.headers).toEqual({
