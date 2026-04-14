@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  parseApprovalList,
   parseCsrfToken,
   parseDashboard,
   parseApplicationHistory,
@@ -17,7 +18,7 @@ import {
   parseRoomSlots,
   parseTeamInfo,
 } from './formatters'
-import { ReportDetailSchema, ReportListItemSchema } from './types'
+import { ApprovalListItemSchema, ReportDetailSchema, ReportListItemSchema } from './types'
 
 describe('formatters', () => {
   test('parseMentoringList parses real list rows', () => {
@@ -530,6 +531,66 @@ describe('formatters', () => {
 
       const result = parseReportDetail(html, 99999)
       expect(result.id).toBe(99999)
+    })
+  })
+
+  describe('parseApprovalList', () => {
+    test('parses approval list table with 10 columns', () => {
+      const html = `
+        <ul class="bbs-total"><li><strong class="color-blue">Total :</strong> 1</li><li><span class="color-blue">1</span>/1 Page</li></ul>
+        <table class=" t">
+        <thead class="pc_only">
+        <tr>
+        <th>NO.</th><th>구분</th><th>제목</th><th>진행날짜</th><th>상태</th>
+        <th class="pc_only">작성자</th><th class="pc_only">등록일</th>
+        <th>인정시간</th><th>출장비</th><th>멘토링/특강 수당</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>1</td>
+        <td>자유 멘토링</td>
+        <td><a href="/sw/mypage/mentoringReport/view.do?menuNo=200073&amp;reportId=12345">2026년 04월 10일 멘토링 보고</a></td>
+        <td>2026-04-10</td>
+        <td>[승인]</td>
+        <td class="pc_only">전수열</td>
+        <td class="pc_only">2026-04-10</td>
+        <td>2시간</td>
+        <td>50,000</td>
+        <td>200,000</td>
+        </tr>
+        </tbody>
+        </table>
+      `
+
+      const result = parseApprovalList(html)
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({
+        id: 12345,
+        category: '자유 멘토링',
+        title: '2026년 04월 10일 멘토링 보고',
+        progressDate: '2026-04-10',
+        status: '[승인]',
+        author: '전수열',
+        createdAt: '2026-04-10',
+        acceptedTime: '2시간',
+        travelExpense: '50,000',
+        mentoringAllowance: '200,000',
+      })
+
+      // Validate against schema
+      result.forEach((item) => {
+        ApprovalListItemSchema.parse(item)
+      })
+    })
+
+    test('returns empty array for nodata table', () => {
+      const html = `
+        <table class=" t"><tbody><tr><td colspan="10" class="nodata">데이터가 없습니다.</td></tr></tbody></table>
+      `
+
+      expect(parseApprovalList(html)).toEqual([])
     })
   })
 })
