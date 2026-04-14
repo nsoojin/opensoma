@@ -220,13 +220,13 @@ function extractNumber(value: string): number {
 export function buildReportPayload(options: {
   menteeRegion: 'S' | 'B'
   reportType: 'MRC010' | 'MRC020'
-  progressDate: string  // yyyy-mm-dd
+  progressDate: string // yyyy-mm-dd
   teamNames?: string
   venue: string
   attendanceCount: number
   attendanceNames: string
-  progressStartTime: string  // HH:mm
-  progressEndTime: string    // HH:mm
+  progressStartTime: string // HH:mm
+  progressEndTime: string // HH:mm
   exceptStartTime?: string
   exceptEndTime?: string
   exceptReason?: string

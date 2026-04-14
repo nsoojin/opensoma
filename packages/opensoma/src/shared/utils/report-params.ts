@@ -1,6 +1,6 @@
 export function buildReportListParams(options?: {
   page?: number
-  searchField?: string  // '' | '0' | '1' (전체/제목/내용)
+  searchField?: string // '' | '0' | '1' (전체/제목/내용)
   searchKeyword?: string
 }): Record<string, string> {
   const params: Record<string, string> = {
@@ -21,8 +21,8 @@ export function buildReportListParams(options?: {
 
 export function buildApprovalListParams(options?: {
   page?: number
-  month?: string   // '01'-'12' or 'all'
-  reportType?: string  // '' | 'MRC010' | 'MRC020'
+  month?: string // '01'-'12' or 'all'
+  reportType?: string // '' | 'MRC010' | 'MRC020'
 }): Record<string, string> {
   const params: Record<string, string> = {
     pageIndex: String(options?.page ?? 1),

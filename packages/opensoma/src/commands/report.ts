@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises'
+
 import { Command } from 'commander'
 
 import * as formatters from '../formatters'
