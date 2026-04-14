@@ -1,8 +1,10 @@
+import { readFile } from 'node:fs/promises'
 import { Command } from 'commander'
 
 import * as formatters from '../formatters'
 import { handleError } from '../shared/utils/error-handler'
 import { formatOutput } from '../shared/utils/output'
+import { buildReportPayload } from '../shared/utils/swmaestro'
 import { getHttpOrExit } from './helpers'
 
 type ListOptions = {
@@ -18,6 +20,28 @@ type ApprovalOptions = {
   page?: string
   month?: string
   type?: string
+  pretty?: boolean
+}
+
+type CreateOptions = {
+  region: string
+  type: string
+  date: string
+  team?: string
+  venue: string
+  attendanceCount: string
+  attendanceNames: string
+  startTime: string
+  endTime: string
+  exceptStart?: string
+  exceptEnd?: string
+  exceptReason?: string
+  subject: string
+  content: string
+  mentorOpinion?: string
+  nonAttendance?: string
+  etc?: string
+  file: string
   pretty?: boolean
 }
 
@@ -77,6 +101,47 @@ async function approvalAction(options: ApprovalOptions): Promise<void> {
   }
 }
 
+async function createAction(options: CreateOptions): Promise<void> {
+  try {
+    const http = await getHttpOrExit()
+    const payload = buildReportPayload({
+      menteeRegion: options.region as 'S' | 'B',
+      reportType: options.type as 'MRC010' | 'MRC020',
+      progressDate: options.date,
+      teamNames: options.team,
+      venue: options.venue,
+      attendanceCount: Number.parseInt(options.attendanceCount, 10),
+      attendanceNames: options.attendanceNames,
+      progressStartTime: options.startTime,
+      progressEndTime: options.endTime,
+      exceptStartTime: options.exceptStart,
+      exceptEndTime: options.exceptEnd,
+      exceptReason: options.exceptReason,
+      subject: options.subject,
+      content: options.content,
+      mentorOpinion: options.mentorOpinion,
+      nonAttendanceNames: options.nonAttendance,
+      etc: options.etc,
+    })
+
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(payload)) {
+      formData.append(key, value)
+    }
+
+    const fileBuffer = await readFile(options.file)
+    const fileName = options.file.split('/').pop() ?? 'file'
+    formData.append('file_1_1', new Blob([fileBuffer]), fileName)
+    formData.append('fileFieldNm_1', 'file_1')
+    formData.append('atchFileId', '')
+
+    await http.postMultipart('/mypage/mentoringReport/insert.do', formData)
+    console.log(formatOutput({ ok: true }, options.pretty))
+  } catch (error) {
+    handleError(error)
+  }
+}
+
 export const reportCommand = new Command('report')
   .description('Browse mentoring reports and approvals')
   .addCommand(
@@ -94,6 +159,30 @@ export const reportCommand = new Command('report')
       .argument('<id>')
       .option('--pretty', 'Pretty print JSON output')
       .action(getAction),
+  )
+  .addCommand(
+    new Command('create')
+      .description('Create a new mentoring report')
+      .requiredOption('--region <S|B>', 'Mentee region (S=Seoul, B=Busan)')
+      .requiredOption('--type <MRC010|MRC020>', 'Report type (MRC010=자유 멘토링, MRC020=멘토 특강)')
+      .requiredOption('--date <yyyy-mm-dd>', 'Session date')
+      .option('--team <names>', 'Team names (comma-separated)')
+      .requiredOption('--venue <venue>', 'Venue name or code')
+      .requiredOption('--attendance-count <n>', 'Number of attendees')
+      .requiredOption('--attendance-names <names>', 'Attendee names (comma-separated)')
+      .requiredOption('--start-time <HH:mm>', 'Session start time')
+      .requiredOption('--end-time <HH:mm>', 'Session end time')
+      .option('--except-start <HH:mm>', 'Break start time')
+      .option('--except-end <HH:mm>', 'Break end time')
+      .option('--except-reason <text>', 'Break reason')
+      .requiredOption('--subject <text>', 'Session subject (min 10 chars)')
+      .requiredOption('--content <text>', 'Session content (min 100 chars)')
+      .option('--mentor-opinion <text>', 'Mentor opinion')
+      .option('--non-attendance <names>', 'Non-attendance names (comma-separated)')
+      .option('--etc <text>', 'Additional notes')
+      .requiredOption('--file <path>', 'Evidence file path (required)')
+      .option('--pretty', 'Pretty print JSON output')
+      .action(createAction),
   )
   .addCommand(
     new Command('approval')

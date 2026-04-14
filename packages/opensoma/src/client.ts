@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+
 import { MENU_NO } from './constants'
 import { CredentialManager } from './credential-manager'
 import { AuthenticationError } from './errors'
@@ -9,6 +11,7 @@ import {
   buildCancelApplicationPayload,
   buildDeleteMentoringPayload,
   buildMentoringPayload,
+  buildReportPayload,
   buildRoomReservationPayload,
   parseEventDetail,
   resolveRoomId,
@@ -24,6 +27,7 @@ import type {
   NoticeDetail,
   NoticeListItem,
   Pagination,
+  ReportCreateOptions,
   ReportDetail,
   ReportListItem,
   RoomCard,
@@ -98,6 +102,7 @@ export class SomaClient {
       searchKeyword?: string
     }): Promise<{ items: ReportListItem[]; pagination: Pagination }>
     get(id: number): Promise<ReportDetail>
+    create(options: ReportCreateOptions, filePath: string): Promise<void>
     approval(options?: {
       page?: number
       month?: string
@@ -283,6 +288,38 @@ export class SomaClient {
           reportId: String(id),
         })
         return formatters.parseReportDetail(html, id)
+      },
+      create: async (options, filePath) => {
+        await this.requireAuth()
+        const payload = buildReportPayload({
+          menteeRegion: options.menteeRegion,
+          reportType: options.reportType,
+          progressDate: options.progressDate,
+          teamNames: options.teamNames,
+          venue: options.venue,
+          attendanceCount: options.attendanceCount,
+          attendanceNames: options.attendanceNames,
+          progressStartTime: options.progressStartTime,
+          progressEndTime: options.progressEndTime,
+          exceptStartTime: options.exceptStartTime,
+          exceptEndTime: options.exceptEndTime,
+          exceptReason: options.exceptReason,
+          subject: options.subject,
+          content: options.content,
+          mentorOpinion: options.mentorOpinion,
+          nonAttendanceNames: options.nonAttendanceNames,
+          etc: options.etc,
+        })
+        const formData = new FormData()
+        for (const [key, value] of Object.entries(payload)) {
+          formData.append(key, value)
+        }
+        const fileBuffer = await readFile(filePath)
+        const fileName = filePath.split('/').pop() ?? 'file'
+        formData.append('file_1_1', new Blob([fileBuffer]), fileName)
+        formData.append('fileFieldNm_1', 'file_1')
+        formData.append('atchFileId', '')
+        await this.http.postMultipart('/mypage/mentoringReport/insert.do', formData)
       },
       approval: async (options) => {
         await this.requireAuth()
