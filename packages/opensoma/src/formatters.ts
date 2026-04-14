@@ -3,6 +3,8 @@ import { type HTMLElement, parse } from 'node-html-parser'
 import {
   ApplicationHistoryItemSchema,
   type ApplicationHistoryItem,
+  ApprovalListItemSchema,
+  type ApprovalListItem,
   DashboardSchema,
   EventListItemSchema,
   type Dashboard,
@@ -19,6 +21,10 @@ import {
   NoticeListItemSchema,
   type Pagination,
   PaginationSchema,
+  type ReportDetail,
+  ReportDetailSchema,
+  type ReportListItem,
+  ReportListItemSchema,
   type RoomCard,
   RoomCardSchema,
   type TeamInfo,
@@ -269,6 +275,91 @@ export function parseCsrfToken(html: string): string {
   }
 
   return token
+}
+
+export function parseReportList(html: string): ReportListItem[] {
+  return findTableRows(html, 9).map((cells) => {
+    const link = cells[2]?.querySelector('a')
+
+    return ReportListItemSchema.parse({
+      id: extractUrlParam(link?.getAttribute('href'), 'reportId'),
+      category: cleanText(cells[1]),
+      title: cleanText(link ?? cells[2]),
+      progressDate: cleanText(cells[3]),
+      status: cleanText(cells[4]),
+      author: cleanText(cells[5]),
+      createdAt: cleanText(cells[6]),
+      acceptedTime: cleanText(cells[7]),
+      payAmount: cleanText(cells[8]),
+    })
+  })
+}
+
+export function parseReportDetail(html: string, id = 0): ReportDetail {
+  const root = parse(html)
+  const labels = extractLabelMap(root)
+
+  const progressTimeText = labels['진행시간'] || ''
+  const exceptTimeText = labels['제외시간'] || ''
+  const progressTimes = progressTimeText.split(/\s*~\s*/)
+  const exceptTimes = exceptTimeText.split(/\s*~\s*/)
+
+  return ReportDetailSchema.parse({
+    id,
+    category: labels['구분'] || '',
+    title: '',
+    progressDate: labels['진행 날짜'] || '',
+    status: labels['상태'] || '',
+    author: labels['작성자'] || '',
+    createdAt: '',
+    acceptedTime: labels['인정시간'] || '',
+    payAmount: labels['지급액'] || '',
+    content: labels['추진 내용'] || '',
+    subject: labels['주제'] || '',
+    menteeRegion: labels['멘토링 대상'] || '',
+    reportType: labels['구분'] || '',
+    teamNames: labels['팀명'] || '',
+    venue: labels['진행 장소'] || '',
+    attendanceCount: extractNumber(labels['참석 연수생'] || ''),
+    attendanceNames: labels['참석자 이름'] || '',
+    progressStartTime: progressTimes[0] || '',
+    progressEndTime: progressTimes[1] || '',
+    exceptStartTime: exceptTimes[0] || '',
+    exceptEndTime: exceptTimes[1] || '',
+    exceptReason: '',
+    mentorOpinion: labels['멘토 의견'] || '',
+    nonAttendanceNames: labels['무단불참자'] || '',
+    etc: labels['특이사항'] || '',
+    files: [],
+  })
+}
+
+export function parseApprovalList(html: string): ApprovalListItem[] {
+  const rows = findTableRows(html, 10)
+
+  if (rows.length === 1) {
+    const firstRow = rows[0]
+    if (firstRow[0]?.getAttribute('colspan') || cleanText(firstRow[0]).includes('데이터가 없습니다')) {
+      return []
+    }
+  }
+
+  return rows.map((cells) => {
+    const link = cells[2]?.querySelector('a')
+
+    return ApprovalListItemSchema.parse({
+      id: extractUrlParam(link?.getAttribute('href'), 'reportId'),
+      category: cleanText(cells[1]),
+      title: cleanText(link ?? cells[2]),
+      progressDate: cleanText(cells[3]),
+      status: cleanText(cells[4]),
+      author: cleanText(cells[5]),
+      createdAt: cleanText(cells[6]),
+      acceptedTime: cleanText(cells[7]),
+      travelExpense: cleanText(cells[8]),
+      mentoringAllowance: cleanText(cells[9]),
+    })
+  })
 }
 
 function findTableRows(html: string, cellCount: number): HTMLElement[][] {
