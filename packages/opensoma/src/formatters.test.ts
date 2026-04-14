@@ -11,10 +11,13 @@ import {
   parseNoticeDetail,
   parseNoticeList,
   parsePagination,
+  parseReportDetail,
+  parseReportList,
   parseRoomList,
   parseRoomSlots,
   parseTeamInfo,
 } from './formatters'
+import { ReportDetailSchema, ReportListItemSchema } from './types'
 
 describe('formatters', () => {
   test('parseMentoringList parses real list rows', () => {
@@ -378,5 +381,155 @@ describe('formatters', () => {
 
   test('parseCsrfToken extracts hidden input', () => {
     expect(parseCsrfToken('<form><input type="hidden" name="csrfToken" value="csrf-123"></form>')).toBe('csrf-123')
+  })
+
+  describe('parseReportList', () => {
+    test('parses report list table with all fields', () => {
+      const html = `
+        <ul class="bbs-total"><li><strong class="color-blue">Total :</strong> 2</li><li><span class="color-blue">1</span>/1 Page</li></ul>
+        <table class=" t">
+        <thead class="pc_only">
+        <tr>
+        <th>NO.</th><th>구분</th><th>제목</th><th>진행날짜</th><th>상태</th>
+        <th class="pc_only">작성자</th><th class="pc_only">등록일</th>
+        <th>인정시간</th><th>지급액</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>2</td>
+        <td>자유 멘토링</td>
+        <td><a href="/sw/mypage/mentoringReport/view.do?menuNo=200049&amp;reportId=12345">2026년 04월 10일 멘토링 보고</a></td>
+        <td>2026-04-10</td>
+        <td>[승인]</td>
+        <td class="pc_only">전수열</td>
+        <td class="pc_only">2026-04-10</td>
+        <td>2시간</td>
+        <td>200,000</td>
+        </tr>
+        <tr>
+        <td>1</td>
+        <td>멘토 특강</td>
+        <td><a href="/sw/mypage/mentoringReport/view.do?menuNo=200049&amp;reportId=67890">2026년 03월 15일 멘토링 보고</a></td>
+        <td>2026-03-15</td>
+        <td>[접수]</td>
+        <td class="pc_only">전수열</td>
+        <td class="pc_only">2026-03-15</td>
+        <td>1시간30분</td>
+        <td>150,000</td>
+        </tr>
+        </tbody>
+        </table>
+      `
+
+      const result = parseReportList(html)
+
+      expect(result).toHaveLength(2)
+      expect(result[0]).toEqual({
+        id: 12345,
+        category: '자유 멘토링',
+        title: '2026년 04월 10일 멘토링 보고',
+        progressDate: '2026-04-10',
+        status: '[승인]',
+        author: '전수열',
+        createdAt: '2026-04-10',
+        acceptedTime: '2시간',
+        payAmount: '200,000',
+      })
+      expect(result[1]).toEqual({
+        id: 67890,
+        category: '멘토 특강',
+        title: '2026년 03월 15일 멘토링 보고',
+        progressDate: '2026-03-15',
+        status: '[접수]',
+        author: '전수열',
+        createdAt: '2026-03-15',
+        acceptedTime: '1시간30분',
+        payAmount: '150,000',
+      })
+
+      // Validate against schema
+      result.forEach((item) => {
+        ReportListItemSchema.parse(item)
+      })
+    })
+
+    test('returns empty array for empty table', () => {
+      const html = `
+        <ul class="bbs-total"><li><strong class="color-blue">Total :</strong> 0</li><li><span class="color-blue">1</span>/1 Page</li></ul>
+        <table class=" t">
+        <thead class="pc_only">
+        <tr>
+        <th>NO.</th><th>구분</th><th>제목</th><th>진행날짜</th><th>상태</th>
+        <th class="pc_only">작성자</th><th class="pc_only">등록일</th>
+        <th>인정시간</th><th>지급액</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+        </table>
+      `
+
+      expect(parseReportList(html)).toEqual([])
+    })
+  })
+
+  describe('parseReportDetail', () => {
+    test('parses report detail view with all fields', () => {
+      const html = `
+        <div class="board-view">
+        <table>
+        <tbody>
+        <tr><th>멘토링 대상</th><td>서울 연수생</td><th>구분</th><td>자유 멘토링</td></tr>
+        <tr><th>진행 날짜</th><td>2026-04-10</td><th>작성자</th><td>전수열</td></tr>
+        <tr><th>팀명</th><td>테스트팀</td><th>진행 장소</th><td>스페이스 A1</td></tr>
+        <tr><th>참석 연수생</th><td>3명</td><th>참석자 이름</th><td>김철수, 이영희, 박민수</td></tr>
+        <tr><th>진행시간</th><td>10:00 ~ 12:00</td><th>제외시간</th><td></td></tr>
+        <tr><th>주제</th><td>AI 프로젝트 멘토링 주제</td></tr>
+        <tr><th>추진 내용</th><td>멘토링 추진 내용을 100자 이상 작성합니다. 이 내용은 멘토링 세션에서 다룬 주요 내용을 포함합니다.</td></tr>
+        <tr><th>멘토 의견</th><td>멘토 의견 내용</td></tr>
+        <tr><th>무단불참자</th><td></td></tr>
+        <tr><th>특이사항</th><td></td></tr>
+        <tr><th>상태</th><td>승인</td><th>인정시간</th><td>2시간</td></tr>
+        <tr><th>지급액</th><td>200,000</td></tr>
+        </tbody>
+        </table>
+        </div>
+      `
+
+      const result = parseReportDetail(html, 12345)
+
+      expect(result.id).toBe(12345)
+      expect(result.menteeRegion).toBe('서울 연수생')
+      expect(result.category).toBe('자유 멘토링')
+      expect(result.progressDate).toBe('2026-04-10')
+      expect(result.author).toBe('전수열')
+      expect(result.subject).toBe('AI 프로젝트 멘토링 주제')
+      expect(result.status).toBe('승인')
+      expect(result.acceptedTime).toBe('2시간')
+      expect(result.payAmount).toBe('200,000')
+
+      // Validate against schema
+      ReportDetailSchema.parse(result)
+    })
+
+    test('uses provided id in result', () => {
+      const html = `
+        <div class="board-view">
+        <table>
+        <tbody>
+        <tr><th>멘토링 대상</th><td>부산 연수생</td><th>구분</th><td>멘토 특강</td></tr>
+        <tr><th>진행 날짜</th><td>2026-03-15</td><th>작성자</th><td>김멘토</td></tr>
+        <tr><th>주제</th><td>테스트 주제</td></tr>
+        <tr><th>추진 내용</th><td>테스트 내용입니다. 100자 이상 작성해야 합니다. 충분한 길이의 테스트 내용을 작성합니다.</td></tr>
+        <tr><th>상태</th><td>접수</td><th>인정시간</th><td>1시간30분</td></tr>
+        <tr><th>지급액</th><td>150,000</td></tr>
+        </tbody>
+        </table>
+        </div>
+      `
+
+      const result = parseReportDetail(html, 99999)
+      expect(result.id).toBe(99999)
+    })
   })
 })
