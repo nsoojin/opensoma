@@ -19,5 +19,8 @@
     "test": "bun run --filter '*' test",
     "link": "bun link --cwd packages/opensoma",
     "unlink": "bun unlink --cwd packages/opensoma"
+  },
+  "devDependencies": {
+    "webreel": "^0.1.4"
   }
 }
