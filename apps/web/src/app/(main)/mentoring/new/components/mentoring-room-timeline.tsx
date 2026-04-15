@@ -1,7 +1,7 @@
 'use client'
 
-import { CalendarBlank } from '@phosphor-icons/react'
-import { useMemo, useState, useTransition } from 'react'
+import { CalendarBlank, CaretLeft, CaretRight } from '@phosphor-icons/react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 
 import { fetchRooms } from '@/app/(main)/mentoring/new/actions'
 import { addThirtyMinutes } from '@/app/(main)/room/lib/room-mentoring'
@@ -9,12 +9,13 @@ import { cn } from '@/lib/cn'
 import type { RoomCard } from '@/lib/sdk'
 import { Button } from '@/ui/button'
 import { Card, CardContent } from '@/ui/card'
+import { Checkbox } from '@/ui/checkbox'
 import { DatePicker } from '@/ui/date-picker'
 import { EmptyState } from '@/ui/empty-state'
-import { Field, FieldLabel } from '@/ui/field'
-import { Select, SelectGroup, SelectItem, SelectPopup, SelectTrigger } from '@/ui/select'
+import { Separator } from '@/ui/separator'
 
-const roomOptions = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'M1', 'M2']
+const aRooms = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8']
+const mRooms = ['M1', 'M2']
 
 export interface TimelineSelection {
   roomId: number
@@ -43,10 +44,20 @@ export function MentoringRoomTimeline({
   onSelect,
 }: MentoringRoomTimelineProps) {
   const [allRooms, setAllRooms] = useState<RoomCard[]>(initialRooms)
-  const rooms = excludeSmallRooms ? allRooms.filter((room) => !isSmallRoom(room.name)) : allRooms
   const [date, setDate] = useState(initialDate)
-  const [roomFilter, setRoomFilter] = useState('')
-  const [isLoading, startTransition] = useTransition()
+  const [selectedRooms, setSelectedRooms] = useState<string[]>([])
+  const [, startTransition] = useTransition()
+
+  const rooms = useMemo(() => {
+    let filtered = allRooms
+    if (selectedRooms.length > 0) {
+      filtered = filtered.filter((room) => selectedRooms.some((code) => room.name.includes(code)))
+    }
+    if (excludeSmallRooms) {
+      filtered = filtered.filter((room) => !isSmallRoom(room.name))
+    }
+    return filtered
+  }, [allRooms, selectedRooms, excludeSmallRooms])
 
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
@@ -59,15 +70,49 @@ export function MentoringRoomTimeline({
     [rooms],
   )
 
-  function handleFilter() {
+  function adjustDate(days: number) {
+    const current = new Date(date)
+    current.setDate(current.getDate() + days)
+    setDate(current.toISOString().slice(0, 10))
+  }
+
+  const isInitialMount = useRef(true)
+  const onSelectRef = useRef(onSelect)
+  onSelectRef.current = onSelect
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
     setSelectedRoomId(null)
     setSelectedSlots([])
-    onSelect(null)
+    onSelectRef.current(null)
 
     startTransition(async () => {
-      const result = await fetchRooms(date, roomFilter || undefined)
+      const result = await fetchRooms(date)
       setAllRooms(result)
     })
+  }, [date])
+
+  // Clear slot selection when the selected room is filtered out
+  useEffect(() => {
+    if (selectedRoomId !== null && !rooms.some((r) => r.itemId === selectedRoomId)) {
+      setSelectedRoomId(null)
+      setSelectedSlots([])
+      onSelectRef.current(null)
+    }
+  }, [rooms, selectedRoomId])
+
+  function handleRoomToggle(room: string, checked: boolean) {
+    setSelectedRooms((prev) => (checked ? [...prev, room] : prev.filter((r) => r !== room)))
+  }
+
+  function handleGroupToggle(groupRooms: string[], checked: boolean) {
+    setSelectedRooms((prev) =>
+      checked ? [...new Set([...prev, ...groupRooms])] : prev.filter((r) => !groupRooms.includes(r)),
+    )
   }
 
   function handleSlotSelect(roomId: number, time: string) {
@@ -112,30 +157,91 @@ export function MentoringRoomTimeline({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 rounded-lg border border-border bg-surface p-4 md:grid-cols-[1fr_1fr_auto]">
-        <Field name="timeline-date">
-          <FieldLabel>예약 날짜</FieldLabel>
-          <DatePicker value={date} onValueChange={setDate} placeholder="날짜를 선택하세요" />
-        </Field>
-        <Field name="timeline-room">
-          <FieldLabel>회의실</FieldLabel>
-          <Select value={roomFilter} onValueChange={setRoomFilter}>
-            <SelectTrigger placeholder="전체 회의실" />
-            <SelectPopup>
-              <SelectGroup label="회의실">
-                {roomOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectPopup>
-          </Select>
-        </Field>
-        <div className="flex gap-2 pt-[26px]">
-          <Button disabled={isLoading} type="button" onClick={handleFilter}>
-            {isLoading ? '조회 중...' : '조회'}
-          </Button>
+      <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
+          <div className="shrink-0">
+            <span className="mb-2 block text-sm font-medium text-foreground-muted">예약 날짜</span>
+            <div className="inline-flex items-center rounded-lg border border-border bg-muted/50">
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                onClick={() => adjustDate(-1)}
+                className="rounded-r-none border-r border-border"
+              >
+                <CaretLeft size={16} weight="bold" />
+              </Button>
+              <DatePicker
+                value={date}
+                onValueChange={setDate}
+                className="h-9 rounded-none border-none bg-transparent shadow-none"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                onClick={() => adjustDate(1)}
+                className="rounded-l-none border-l border-border"
+              >
+                <CaretRight size={16} weight="bold" />
+              </Button>
+            </div>
+          </div>
+
+          <Separator className="lg:hidden" />
+          <div className="hidden lg:block lg:self-stretch">
+            <div className="h-full w-px bg-border" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <span className="mb-2 block text-sm font-medium text-foreground-muted">회의실</span>
+            <div className="space-y-2">
+              {!excludeSmallRooms ? (
+                <div className="rounded-lg border border-border bg-muted/30 p-2.5">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <Checkbox
+                      checked={aRooms.every((r) => selectedRooms.includes(r))}
+                      onCheckedChange={(checked) => handleGroupToggle(aRooms, checked)}
+                      labelClassName="font-semibold"
+                    >
+                      전체
+                    </Checkbox>
+                    <div className="mx-0.5 h-4 w-px bg-border" />
+                    {aRooms.map((room) => (
+                      <Checkbox
+                        key={room}
+                        checked={selectedRooms.includes(room)}
+                        onCheckedChange={(checked) => handleRoomToggle(room, checked)}
+                      >
+                        {room}
+                      </Checkbox>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+              <div className="rounded-lg border border-border bg-muted/30 p-2.5">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <Checkbox
+                    checked={mRooms.every((r) => selectedRooms.includes(r))}
+                    onCheckedChange={(checked) => handleGroupToggle(mRooms, checked)}
+                    labelClassName="font-semibold"
+                  >
+                    전체
+                  </Checkbox>
+                  <div className="mx-0.5 h-4 w-px bg-border" />
+                  {mRooms.map((room) => (
+                    <Checkbox
+                      key={room}
+                      checked={selectedRooms.includes(room)}
+                      onCheckedChange={(checked) => handleRoomToggle(room, checked)}
+                    >
+                      {room}
+                    </Checkbox>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
