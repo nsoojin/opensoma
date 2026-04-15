@@ -75,7 +75,7 @@ export function MobileDrawer({ username }: MobileDrawerProps) {
         )}
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-4">
-          <Link href="/" className="text-lg font-extrabold text-foreground">
+          <Link href="/dashboard" className="text-lg font-extrabold text-foreground">
             오픈소마
           </Link>
           <button
@@ -90,7 +90,7 @@ export function MobileDrawer({ username }: MobileDrawerProps) {
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-4">
           {navItems.map((item, index) => {
             const itemPathname = item.href.split('?')[0]
-            const isActive = itemPathname === '/' ? pathname === '/' : pathname.startsWith(itemPathname)
+            const isActive = pathname === itemPathname || pathname.startsWith(itemPathname + '/')
             const IconComponent = item.icon
 
             return (

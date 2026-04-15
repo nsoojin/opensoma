@@ -1,0 +1,43 @@
+---
+title: Notice
+description: 공지사항 API
+order: 6
+---
+
+SWMaestro 플랫폼의 공지사항을 조회합니다. 읽기 전용이며 별도의 필터 옵션은 없습니다.
+
+## List
+
+공지사항 목록을 페이지 단위로 조회합니다. `pagination` 객체에 전체 페이지 수와 현재 페이지 정보가 포함됩니다.
+
+```typescript
+const { items, pagination } = await client.notice.list()
+const { items: page2 } = await client.notice.list({ page: 2 })
+```
+
+### Response
+
+```typescript
+interface NoticeListItem {
+  id: number
+  title: string
+  author: string
+  createdAt: string
+}
+```
+
+## Get Detail
+
+특정 공지사항의 전체 내용을 조회합니다. `content`는 HTML 형식으로 반환됩니다.
+
+```typescript
+const notice = await client.notice.get(456)
+```
+
+### Response
+
+```typescript
+interface NoticeDetail extends NoticeListItem {
+  content: string // HTML
+}
+```

@@ -31,7 +31,10 @@ export function Sidebar({ username }: SidebarProps) {
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-4">
           {!isSidebarCollapsed && (
-            <Link href="/" className="flex items-center gap-2 text-lg font-extrabold text-foreground hover:opacity-80">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 text-lg font-extrabold text-foreground hover:opacity-80"
+            >
               오픈소마
             </Link>
           )}
@@ -49,7 +52,7 @@ export function Sidebar({ username }: SidebarProps) {
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
           {navItems.map((item) => {
             const itemPathname = item.href.split('?')[0]
-            const isActive = itemPathname === '/' ? pathname === '/' : pathname.startsWith(itemPathname)
+            const isActive = pathname === itemPathname || pathname.startsWith(itemPathname + '/')
             const IconComponent = item.icon
             const linkClassName = cn(
               'flex items-center overflow-hidden rounded-lg py-2 text-sm font-semibold transition-colors focus:outline-none',

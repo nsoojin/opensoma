@@ -1,0 +1,131 @@
+---
+title: Mentoring
+description: 멘토링 API
+order: 4
+---
+
+멘토링 세션을 조회, 생성, 수정, 삭제하고 신청 및 취소까지 모두 처리할 수 있습니다. 멘토가 세션을 관리하거나 연수생이 신청 내역을 확인할 때 사용합니다.
+
+## List
+
+필터 없이 호출하면 모든 상태의 세션을 반환합니다. `pagination` 객체에 전체 페이지 수와 현재 페이지 정보가 포함됩니다.
+
+```typescript
+const { items, pagination } = await client.mentoring.list()
+```
+
+### Options
+
+```typescript
+await client.mentoring.list({
+  status: 'open', // 'open' | 'closed'
+  type: 'public', // 'public' | 'lecture'
+  search: {
+    field: 'title', // 'title' | 'author' | 'content'
+    value: '키워드',
+  },
+  page: 1,
+})
+```
+
+내 멘토링만 조회:
+
+```typescript
+await client.mentoring.list({
+  search: { field: 'author', value: '', me: true },
+})
+```
+
+## Get Detail
+
+신청자 목록, 정원, 장소 등 전체 정보가 포함됩니다. `applicants` 배열에서 신청자별 상태를 확인할 수 있습니다.
+
+```typescript
+const detail = await client.mentoring.get(123)
+```
+
+### Response
+
+```typescript
+interface MentoringDetail {
+  id: number
+  title: string
+  type: '자유 멘토링' | '멘토 특강'
+  registrationPeriod: { start: string; end: string }
+  sessionDate: string
+  sessionTime: { start: string; end: string }
+  attendees: { current: number; max: number }
+  approved: boolean
+  status: '접수중' | '마감'
+  author: string
+  createdAt: string
+  content: string
+  venue: string
+  applicants: Array<{
+    name: string
+    appliedAt: string
+    cancelledAt: string
+    status: string
+  }>
+}
+```
+
+## Create
+
+`regStart`와 `regEnd`를 생략하면 `date`와 동일한 날짜로 설정됩니다. `content`는 HTML 형식입니다.
+
+```typescript
+await client.mentoring.create({
+  title: '멘토링 제목',
+  type: 'public', // 'public' | 'lecture'
+  date: '2025-01-15',
+  startTime: '14:00',
+  endTime: '16:00',
+  venue: '스페이스 A1',
+  maxAttendees: 10, // optional
+  regStart: '2025-01-10', // optional, defaults to date
+  regEnd: '2025-01-15', // optional, defaults to date
+  content: '<p>내용</p>', // optional, HTML
+})
+```
+
+## Update
+
+변경할 필드만 전달합니다. 지정하지 않은 필드는 기존 값을 유지합니다.
+
+```typescript
+await client.mentoring.update(123, { title: '새 제목' })
+await client.mentoring.update(123, {
+  venue: '스페이스 A2',
+  startTime: '15:00',
+  endTime: '17:00',
+})
+```
+
+## Delete
+
+```typescript
+await client.mentoring.delete(123)
+```
+
+## Apply / Cancel
+
+신청 취소 시 `applySn`과 `qustnrSn` 두 값이 모두 필요합니다. `history()`로 조회한 결과에서 확인할 수 있습니다.
+
+```typescript
+await client.mentoring.apply(123)
+
+await client.mentoring.cancel({
+  applySn: 456,
+  qustnrSn: 123,
+})
+```
+
+## Application History
+
+내 멘토링 신청 내역을 조회합니다. 취소에 필요한 `applySn`과 `qustnrSn` 값이 포함됩니다.
+
+```typescript
+const { items, pagination } = await client.mentoring.history()
+const { items: page2 } = await client.mentoring.history({ page: 2 })
+```

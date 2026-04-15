@@ -1,0 +1,59 @@
+---
+title: Dashboard
+description: 대시보드 API
+order: 3
+---
+
+현재 로그인한 사용자의 기본 정보와 최근 멘토링 세션, 회의실 예약 현황을 한 번에 조회합니다. AI 에이전트가 사용자 컨텍스트를 파악할 때 첫 번째로 호출하기 좋은 API입니다.
+
+## Get Dashboard
+
+```typescript
+const dashboard = await client.dashboard.get()
+```
+
+### Response
+
+```typescript
+interface Dashboard {
+  name: string
+  role: string
+  organization: string
+  position: string
+  team?: {
+    name: string
+    members: string
+    mentor: string
+  }
+  mentoringSessions: DashboardStatusItem[]
+  roomReservations: DashboardStatusItem[]
+}
+
+interface DashboardStatusItem {
+  title: string
+  url: string
+  status: string
+  date?: string
+  time?: string
+  timeEnd?: string
+  venue?: string
+  type?: '자유 멘토링' | '멘토 특강'
+}
+```
+
+### Example
+
+```typescript
+const dashboard = await client.dashboard.get()
+
+console.log(`${dashboard.name} (${dashboard.role})`)
+
+if (dashboard.team) {
+  console.log(`팀: ${dashboard.team.name}`)
+  console.log(`멘토: ${dashboard.team.mentor}`)
+}
+
+for (const session of dashboard.mentoringSessions) {
+  console.log(`${session.date} ${session.time} - ${session.title} [${session.status}]`)
+}
+```

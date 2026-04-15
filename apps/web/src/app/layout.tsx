@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: '%s | 오픈소마',
     default: '오픈소마',
   },
-  description: 'SWMaestro MyPage',
+  description: 'SWMaestro CLI, SDK & Web',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

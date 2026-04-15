@@ -1,0 +1,87 @@
+---
+title: Room
+description: 회의실 API
+order: 5
+---
+
+회의실 목록 조회, 예약 가능 시간 확인, 예약까지 모두 처리할 수 있습니다. 예약 전에 `available()`로 빈 슬롯을 먼저 확인하는 것이 좋습니다.
+
+## List Rooms
+
+날짜별 회의실 목록과 각 슬롯의 예약 가능 여부를 조회합니다. `date`를 생략하면 오늘 날짜를 기준으로 조회합니다.
+
+```typescript
+const rooms = await client.room.list()
+```
+
+### Options
+
+```typescript
+await client.room.list({
+  date: '2025-01-15', // defaults to today
+  room: 'A1', // filter by room code
+})
+```
+
+### Response
+
+```typescript
+interface RoomCard {
+  itemId: number
+  name: string
+  capacity: number
+  availablePeriod: { start: string; end: string }
+  description: string
+  timeSlots: Array<{
+    time: string // 'HH:mm'
+    available: boolean
+  }>
+}
+```
+
+## Check Availability
+
+특정 회의실의 날짜별 예약 가능 시간 슬롯을 조회합니다. `roomId`는 아래 Room Codes 표의 숫자 ID입니다.
+
+```typescript
+const slots = await client.room.available(17, '2025-01-15')
+
+const openSlots = slots.filter((s) => s.available)
+console.log(`${openSlots.length} slots available`)
+```
+
+## Reserve
+
+슬롯은 30분 단위이며 연속된 시간만 예약할 수 있습니다. 최대 8슬롯(4시간)까지 가능합니다.
+
+```typescript
+await client.room.reserve({
+  roomId: 17,
+  date: '2025-01-15',
+  slots: ['14:00', '14:30', '15:00'], // consecutive, max 8
+  title: '팀 회의',
+  attendees: 3, // optional, defaults to 1
+  notes: '비고', // optional
+})
+```
+
+## Room Codes
+
+| Code | Room ID | Name        |
+| ---- | ------- | ----------- |
+| A1   | 17      | 스페이스 A1 |
+| A2   | 18      | 스페이스 A2 |
+| A3   | 19      | 스페이스 A3 |
+| A4   | 20      | 스페이스 A4 |
+| A5   | 21      | 스페이스 A5 |
+| A6   | 22      | 스페이스 A6 |
+| A7   | 23      | 스페이스 A7 |
+| A8   | 24      | 스페이스 A8 |
+
+`ROOM_IDS` constant로도 접근 가능합니다:
+
+```typescript
+import { ROOM_IDS } from 'opensoma'
+
+const roomId = ROOM_IDS['A1'] // 17
+```
