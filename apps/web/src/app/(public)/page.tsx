@@ -1,0 +1,101 @@
+import { ArrowRight, Browser, Command, Package, Terminal } from '@phosphor-icons/react/dist/ssr'
+import type { Metadata } from 'next'
+import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: '오픈소마 — SWMaestro CLI, SDK & Web',
+  description: 'SWMaestro 플랫폼을 웹, 커맨드라인, 프로그래밍 방식으로 사용할 수 있는 오픈소스 프로젝트',
+}
+
+export default function LandingPage() {
+  return (
+    <div className="flex flex-1 flex-col">
+      <section className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">
+        <h1 className="max-w-2xl text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          SWMaestro
+          <br />
+          <span className="text-primary">Web, CLI & SDK</span>
+        </h1>
+        <p className="mt-6 max-w-lg text-lg text-foreground-muted">
+          멘토링, 회의실 예약, 공지사항, 행사 등 SWMaestro 기능을 웹, 터미널, 코드에서 모두 사용할 수 있습니다.
+        </p>
+        <div className="mt-4 text-sm text-foreground-muted">
+          AI 에이전트가 SWMaestro 플랫폼과 상호작용할 수 있도록 설계되었습니다.
+        </div>
+
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/docs"
+            className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+          >
+            Get started
+            <ArrowRight size={16} />
+          </Link>
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-2.5 font-mono text-sm text-foreground">
+            <span className="text-foreground-muted">$</span>
+            npm install -g opensoma
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border bg-muted/30 px-4 py-20">
+        <div className="mx-auto grid max-w-4xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <FeatureCard
+            icon={Browser}
+            title="Web"
+            description="대시보드, 멘토링, 회의실 예약 등 SWMaestro 기능을 웹에서 바로 사용합니다."
+          />
+          <FeatureCard
+            icon={Terminal}
+            title="CLI"
+            description="멘토링 생성, 회의실 예약, 공지사항 조회 등 모든 작업을 터미널에서 수행합니다."
+          />
+          <FeatureCard
+            icon={Package}
+            title="SDK"
+            description="TypeScript SDK로 SWMaestro 기능에 프로그래밍 방식으로 접근합니다."
+          />
+          <FeatureCard
+            icon={Command}
+            title="AI Agent"
+            description="Agent Skills로 AI 에이전트가 SWMaestro 플랫폼과 직접 상호작용합니다."
+          />
+        </div>
+      </section>
+
+      <footer className="border-t border-border px-4 py-8">
+        <div className="mx-auto flex max-w-5xl items-center justify-between text-xs text-foreground-muted">
+          <span>MIT License</span>
+          <a
+            href="https://github.com/opensoma/opensoma"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground"
+          >
+            GitHub
+          </a>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: typeof Terminal
+  title: string
+  description: string
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface p-6">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-light">
+        <Icon size={20} className="text-primary" />
+      </div>
+      <h3 className="mb-2 text-base font-bold text-foreground">{title}</h3>
+      <p className="text-sm leading-relaxed text-foreground-muted">{description}</p>
+    </div>
+  )
+}

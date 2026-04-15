@@ -62,7 +62,7 @@ export default function LoginPage() {
               입력하신 계정 정보는 서버에 저장되지 않으며, 로그인 외 어떤 용도로도 사용되지 않습니다. 오픈소마의 전체
               소스코드는{' '}
               <a
-                href="https://github.com/devxoul/opensoma"
+                href="https://github.com/opensoma/opensoma"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"

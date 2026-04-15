@@ -1,0 +1,51 @@
+---
+title: Room
+description: 회의실 예약 및 조회
+order: 5
+---
+
+회의실 목록 조회, 예약 가능 시간 확인, 예약까지 모두 CLI에서 처리할 수 있습니다. 예약 전에 `room available`로 빈 슬롯을 먼저 확인하는 것이 좋습니다.
+
+## List Rooms
+
+날짜별 회의실 목록과 각 슬롯의 예약 가능 여부를 조회합니다. `--date`를 생략하면 오늘 날짜를 기준으로 조회합니다.
+
+```bash
+opensoma room list
+opensoma room list --date 2025-01-15 --room A1
+```
+
+## Check Availability
+
+특정 회의실의 날짜별 예약 가능 시간 슬롯을 조회합니다. `<roomId>`는 아래 Room Codes 표의 숫자 ID입니다.
+
+```bash
+opensoma room available <roomId> --date 2025-01-15
+```
+
+## Reserve
+
+슬롯은 30분 단위이며 연속된 시간만 예약할 수 있습니다. 최대 8슬롯(4시간)까지 가능합니다.
+
+```bash
+opensoma room reserve \
+  --room A1 \
+  --date 2025-01-15 \
+  --slots "14:00,14:30,15:00" \
+  --title "팀 회의"
+```
+
+`--room`에는 코드(A1~A8)를 사용합니다. 내부적으로 숫자 ID로 변환됩니다.
+
+## Room Codes
+
+| Code | Room        |
+| ---- | ----------- |
+| A1   | 스페이스 A1 |
+| A2   | 스페이스 A2 |
+| A3   | 스페이스 A3 |
+| A4   | 스페이스 A4 |
+| A5   | 스페이스 A5 |
+| A6   | 스페이스 A6 |
+| A7   | 스페이스 A7 |
+| A8   | 스페이스 A8 |

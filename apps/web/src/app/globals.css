@@ -4,6 +4,7 @@
 @import './tokens/color-semantic-dark.css';
 @import './tokens/elevation.css';
 @import './tokens/transition.css';
+@import './(public)/docs/docs-prose.css';
 
 @theme {
   --font-sans:

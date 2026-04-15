@@ -15,7 +15,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <Sidebar username={session.isLoggedIn ? session.username : undefined} />
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-surface px-4 md:hidden">
-            <Link href="/" className="text-lg font-extrabold text-foreground">
+            <Link href="/dashboard" className="text-lg font-extrabold text-foreground">
               오픈소마
             </Link>
             <MobileMenuButton />

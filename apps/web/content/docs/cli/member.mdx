@@ -1,0 +1,19 @@
+---
+title: Member
+description: 회원 정보 조회
+order: 8
+---
+
+현재 로그인한 사용자의 회원 정보를 조회합니다. 이름, 이메일, 소속 기관, 직위 등 기본 프로필 정보를 반환합니다.
+
+## Show Member Info
+
+```bash
+opensoma member show
+```
+
+출력에는 이메일, 이름, 성별, 생년월일, 연락처, 소속, 직위가 포함됩니다. `--pretty`를 붙이면 읽기 쉬운 형태로 출력됩니다.
+
+```bash
+opensoma member show --pretty
+```

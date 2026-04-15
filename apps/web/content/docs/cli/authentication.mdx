@@ -1,0 +1,49 @@
+---
+title: Authentication
+description: 인증 설정 및 관리
+order: 1
+---
+
+모든 CLI 명령어는 인증이 필요합니다. 인증 방법은 두 가지입니다. 브라우저에 이미 로그인되어 있다면 세션 추출이 가장 빠릅니다. CI/CD 환경이나 자동화 스크립트에서는 아이디/비밀번호 방식을 사용하세요.
+
+인증 정보는 `~/.config/opensoma/credentials.json`에 저장되며, 파일 권한은 `0600`으로 설정됩니다.
+
+## Browser Session Extraction
+
+Chromium 계열 브라우저(Chrome, Edge, Brave, Arc, Vivaldi)에서 swmaestro.ai에 로그인된 세션을 자동으로 추출합니다. 브라우저가 실행 중이지 않아도 됩니다. 쿠키 파일에서 직접 읽어옵니다.
+
+```bash
+opensoma auth extract
+```
+
+## Username / Password Login
+
+아이디와 비밀번호로 직접 로그인합니다. 환경변수를 사용하면 스크립트에서 자격증명을 하드코딩하지 않아도 됩니다.
+
+```bash
+opensoma auth login --username <아이디> --password <비밀번호>
+```
+
+환경변수로도 전달 가능합니다:
+
+```bash
+export OPENSOMA_USERNAME=<아이디>
+export OPENSOMA_PASSWORD=<비밀번호>
+opensoma auth login
+```
+
+## Check Auth Status
+
+현재 저장된 인증 정보의 유효성을 확인합니다. 세션이 만료되었거나 인증 정보가 없으면 오류를 반환합니다.
+
+```bash
+opensoma auth status
+```
+
+## Logout
+
+```bash
+opensoma auth logout
+```
+
+가능하면 SWMaestro 서버 세션 로그아웃도 함께 시도한 뒤, 로컬 인증 정보를 삭제합니다.

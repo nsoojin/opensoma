@@ -1,0 +1,141 @@
+.docs-prose {
+  line-height: 1.75;
+  color: var(--color-foreground);
+}
+
+.docs-prose h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.5rem;
+}
+
+.docs-prose .lead {
+  font-size: 1.125rem;
+  color: var(--color-foreground-muted);
+  margin-bottom: 2rem;
+}
+
+.docs-prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.docs-prose h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.docs-prose p {
+  margin-bottom: 1rem;
+}
+
+.docs-prose a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.docs-prose a:hover {
+  text-decoration: underline;
+}
+
+.docs-prose strong {
+  font-weight: 700;
+}
+
+.docs-prose ul,
+.docs-prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.docs-prose ul {
+  list-style-type: disc;
+}
+
+.docs-prose ol {
+  list-style-type: decimal;
+}
+
+.docs-prose li {
+  margin-bottom: 0.375rem;
+}
+
+.docs-prose li > ul,
+.docs-prose li > ol {
+  margin-top: 0.375rem;
+  margin-bottom: 0;
+}
+
+.docs-prose code:not(pre code) {
+  font-size: 0.875em;
+  font-weight: 500;
+  padding: 0.2em 0.4em;
+  border-radius: 0.375rem;
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+}
+
+.docs-prose pre {
+  margin-bottom: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.docs-prose pre code {
+  display: block;
+  padding: 1rem 1.25rem;
+}
+
+.docs-prose table {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.docs-prose th {
+  font-weight: 600;
+  text-align: left;
+  padding: 0.625rem 1rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.docs-prose td {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+.docs-prose blockquote {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-primary-light);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--color-foreground);
+}
+
+.docs-prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.docs-prose hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.docs-prose img {
+  max-width: 100%;
+  border-radius: 0.75rem;
+}

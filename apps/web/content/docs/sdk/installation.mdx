@@ -1,0 +1,13 @@
+---
+title: Installation
+description: opensoma SDK 설치
+order: 0
+---
+
+TypeScript/JavaScript 프로젝트에서 opensoma SDK를 사용하려면 패키지를 설치합니다. Node.js 18 이상이 필요합니다.
+
+```bash
+npm install opensoma
+```
+
+설치 후 `SomaClient`를 import해서 사용합니다. 모든 API 호출 전에 `await client.login()`으로 인증을 완료해야 합니다. 세션 쿠키로 직접 인증하는 경우에는 `login()` 호출이 필요 없습니다.

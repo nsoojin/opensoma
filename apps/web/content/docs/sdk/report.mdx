@@ -1,0 +1,86 @@
+---
+title: Report
+description: 보고서 API
+order: 10
+---
+
+멘토링 활동 보고서를 작성, 조회, 수정하고 승인 현황을 확인할 수 있습니다. 보고서 생성 시 파일 첨부가 필요합니다.
+
+## List
+
+보고서 목록을 페이지 단위로 조회합니다. 제목 또는 작성자로 검색할 수 있습니다.
+
+```typescript
+const { items, pagination } = await client.report.list()
+```
+
+### Options
+
+```typescript
+await client.report.list({
+  page: 1,
+  searchField: '0', // '0' (제목) | '1' (작성자)
+  searchKeyword: '키워드',
+})
+```
+
+## Get Detail
+
+특정 보고서의 상세 내용을 조회합니다.
+
+```typescript
+const report = await client.report.get(123)
+```
+
+## Create
+
+파일 첨부와 함께 보고서를 생성합니다. `file` 파라미터는 `Buffer` 또는 파일 경로 문자열을 받습니다. `subject`는 최소 10자, `content`는 최소 100자 이상이어야 합니다.
+
+```typescript
+await client.report.create(
+  {
+    menteeRegion: 'S', // 'S' (서울) | 'B' (부산)
+    reportType: 'MRC010', // 'MRC010' (자유 멘토링) | 'MRC020' (멘토 특강)
+    progressDate: '2025-01-15',
+    venue: '스페이스 A1',
+    attendanceCount: 3,
+    attendanceNames: '홍길동, 김철수, 이영희',
+    progressStartTime: '14:00',
+    progressEndTime: '16:00',
+    subject: '멘토링 주제 (최소 10자)',
+    content: '멘토링 내용 (최소 100자) ...',
+  },
+  '/path/to/attachment.pdf',
+)
+
+// Buffer로도 전달 가능
+await client.report.create(options, buffer, 'report.pdf')
+```
+
+## Update
+
+변경할 필드만 전달합니다. 파일을 교체하려면 세 번째 인자로 새 파일 경로 또는 Buffer를 전달합니다.
+
+```typescript
+await client.report.update(123, {
+  subject: '수정된 주제',
+  content: '수정된 내용 ...',
+})
+
+// 파일도 교체 가능
+await client.report.update(123, { subject: '수정' }, '/path/to/new-file.pdf')
+```
+
+## Approval List
+
+보고서 승인 현황을 조회합니다. 월별 또는 보고서 유형별로 필터링할 수 있습니다.
+
+```typescript
+const { items, pagination } = await client.report.approval()
+
+await client.report.approval({
+  page: 1,
+  month: '01', // '01'-'12' or 'all'
+  reportType: 'MRC010',
+})
+```

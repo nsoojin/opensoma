@@ -4,7 +4,7 @@ import { CalendarBlank, ChalkboardTeacher, House, Megaphone, Newspaper, Notebook
 import { buildMentoringUrl } from './mentoring-url'
 
 export const navItems: Array<{ href: string; label: string; icon: Icon }> = [
-  { href: '/', label: '대시보드', icon: House },
+  { href: '/dashboard', label: '대시보드', icon: House },
   { href: buildMentoringUrl({ search: 'author:@me' }), label: '멘토링/특강', icon: ChalkboardTeacher },
   { href: '/room', label: '회의실', icon: CalendarBlank },
   { href: '/report', label: '보고서', icon: Notebook },

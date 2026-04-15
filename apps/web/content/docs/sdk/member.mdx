@@ -1,0 +1,35 @@
+---
+title: Member
+description: 회원 정보 API
+order: 8
+---
+
+현재 로그인한 사용자의 회원 정보를 조회합니다. 이름, 이메일, 소속 기관, 직위 등 기본 프로필 정보를 반환합니다.
+
+## Show
+
+```typescript
+const member = await client.member.show()
+```
+
+### Response
+
+```typescript
+interface MemberInfo {
+  email: string
+  name: string
+  gender: string
+  birthDate: string
+  phone: string
+  organization: string
+  position: string
+}
+```
+
+### Example
+
+```typescript
+const member = await client.member.show()
+console.log(`${member.name} (${member.email})`)
+console.log(`${member.organization} - ${member.position}`)
+```
