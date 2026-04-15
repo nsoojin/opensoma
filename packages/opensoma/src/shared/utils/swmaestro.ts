@@ -30,7 +30,7 @@ export function buildMentoringPayload(params: {
     eventStime: params.startTime,
     eventEtime: params.endTime,
     place: params.venue,
-    qestnarCn: params.content ?? '',
+    qestnarCn: formatEditorContent(params.content ?? ''),
     atchFileId: '',
     fileFieldNm_1: '',
     stateCd: 'QST020',
@@ -190,7 +190,7 @@ export function parseEventDetail(html: string): Record<string, unknown> {
   return {
     id: extractNumber(labels.NO ?? labels.번호 ?? root.querySelector('[name="bbsId"]')?.getAttribute('value') ?? '0'),
     title: labels.제목 ?? cleanText(root.querySelector('h1, h2, .title')?.text),
-    content: contentNode?.innerHTML.trim() ?? '',
+    content: decodeHtmlEntities(contentNode?.innerHTML.trim() ?? ''),
     fields: labels,
   }
 }
@@ -214,6 +214,29 @@ function extractLabelMap(root: ReturnType<typeof parse>): Record<string, string>
   }
 
   return map
+}
+
+const EDITOR_P_STYLE = 'font-family: 굴림; font-size: 12pt; line-height: 1.2; margin-top: 0px; margin-bottom: 0px;'
+
+function formatEditorContent(content: string): string {
+  if (!content) return ''
+  const decoded = decodeHtmlEntities(content)
+  if (/<(?:p|div|h[1-6]|ul|ol|table|br)\b/i.test(decoded)) {
+    return decoded
+  }
+  return decoded
+    .split(/\n/)
+    .map((line) => `<p style="${EDITOR_P_STYLE}">${line || '&nbsp;'}</p>`)
+    .join('')
+}
+
+function decodeHtmlEntities(html: string): string {
+  return html
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
 }
 
 function cleanText(value: string | null | undefined): string {

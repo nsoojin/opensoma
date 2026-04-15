@@ -98,7 +98,7 @@ export function parseMentoringDetail(html: string, id = 0): MentoringDetail {
     status: extractStatus(labels.상태 || rawTitle),
     author: labels['작성자'] || '',
     createdAt: labels['등록일'] || '',
-    content: contentNode?.innerHTML.trim() ?? '',
+    content: decodeHtmlEntities(contentNode?.innerHTML.trim() ?? ''),
     venue: labels['장소'] || '',
     applicants,
   })
@@ -202,7 +202,7 @@ export function parseNoticeDetail(html: string, id = 0): NoticeDetail {
     title: cleanText(top?.querySelector('.tit')) || labels['제목'] || cleanText(root.querySelector('h1, h2, .title')),
     author,
     createdAt,
-    content: contentNode?.innerHTML.trim() ?? '',
+    content: decodeHtmlEntities(contentNode?.innerHTML.trim() ?? ''),
   })
 }
 
@@ -655,6 +655,15 @@ function normalizeDate(value: string): string {
 function normalizeTime(value: string): string {
   const match = value.match(/(\d{2}:\d{2})/)
   return match?.[1] ?? ''
+}
+
+function decodeHtmlEntities(html: string): string {
+  return html
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&') // must be last to avoid double-decoding
 }
 
 function cleanText(value: string | HTMLElement | null | undefined): string {
