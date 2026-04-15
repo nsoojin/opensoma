@@ -396,9 +396,9 @@ You can navigate through these pages by using the `--page <n>` option, where `<n
 
 For detailed workflow examples and best practices, refer to the [references/common-patterns.md](references/common-patterns.md) document. This includes patterns for daily schedule checks, creating mentoring sessions with room reservations, and handling common error scenarios.
 
-### Writing Mentoring Reports from Transcriptions
+### Writing Mentoring Reports
 
-For the complete methodology on creating mentoring reports from transcriptions or meeting notes — including content extraction guidelines, evidence PDF capture via browser automation, and the full submit/update workflow — read [references/mentoring-report.md](references/mentoring-report.md).
+For the complete methodology on creating mentoring reports from any source material (transcriptions, lecture slides, personal notes, or memory) — including content extraction by source type, evidence PDF capture via browser automation, and the full submit/update workflow — read [references/mentoring-report.md](references/mentoring-report.md).
 
 ### Troubleshooting
 

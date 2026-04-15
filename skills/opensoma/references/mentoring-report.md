@@ -1,11 +1,33 @@
 # Mentoring Report Writing Guide
 
-Complete methodology for creating and submitting mentoring reports on the SWMaestro platform via `opensoma` CLI. This covers the full pipeline: reading transcriptions, extracting structured data, capturing evidence, and submitting/updating reports.
+Complete methodology for creating and submitting mentoring reports on the SWMaestro platform via `opensoma` CLI. Reports can be written from various source materials — transcriptions, lecture slides, personal notes, or even just the mentor's memory of the session.
 
 ## Prerequisites
 
 - `opensoma` CLI authenticated (`opensoma auth status` to verify)
 - `agent-browser` CLI for PDF evidence capture (required)
+
+## Source Types
+
+Different source materials require different extraction approaches. Identify what you're working with:
+
+| Source Type | What You Have | Extraction Approach |
+|-------------|---------------|---------------------|
+| **Transcription** | STT output from recording (`.md`, `.txt`, `.json`) | Extract topics, advice given, action items from conversation flow. Ignore inaccurate speaker labels — focus on content substance. |
+| **Lecture Slides** | 강의자료, PDF, PPT | Summarize each section/slide group. Note key concepts taught, examples used, Q&A if available. |
+| **Handwritten/Personal Notes** | Mentor or mentee notes, bullet points | Expand into structured prose. Fill gaps from memory or context. |
+| **Memory Only** | No written source — mentor recalls the session | Ask the mentor for key topics, decisions made, action items. Structure from their answers. |
+| **Mixed** | Combination of above | Cross-reference sources. Use the most detailed source as primary, others to fill gaps. |
+
+### Source-Specific Tips
+
+**Transcription**: Speaker labels from STT are often inaccurate — don't rely on them for attribution. Focus on what was said, not who said it, unless names are explicitly mentioned in the conversation. Look for metadata (date, duration) in the file header.
+
+**Lecture Slides**: The report should capture what was *taught and discussed*, not just list slide titles. Include the mentor's explanations, emphasis points, and any live demos or examples that went beyond the slides.
+
+**Notes**: Notes are typically terse. Expand abbreviations, add context that would be obvious to the note-taker but not to a report reader. Ask the user for clarification if notes are ambiguous.
+
+**Memory Only**: Ask structured questions — "What were the main topics?", "What advice did you give?", "Were there action items?" — then compose the report from the answers.
 
 ## Report Field Reference
 
@@ -56,7 +78,7 @@ Find the session by date/time. Note the session ID for evidence capture later.
 
 ### Step 2: Get attendee full names
 
-Transcriptions usually only contain first names. Get full names from the mentoring session detail page — the attendee table on the platform shows full names (성+이름):
+Source materials often only contain first names or nicknames. Get full names from the mentoring session detail page — the attendee table on the platform shows full names (성+이름):
 
 ```bash
 opensoma mentoring get <session-id> --pretty
@@ -64,45 +86,60 @@ opensoma mentoring get <session-id> --pretty
 
 If full names aren't in the CLI output, use the browser evidence capture step (Step 4) — the session page shows the full attendee table with names.
 
-### Step 3: Extract information from transcription
+### Step 3: Write the report content
 
-From the transcription or meeting notes, extract:
-
-1. **Date, time, venue** — from metadata or context clues
-2. **Attendee names** — cross-reference with Step 2 for full names
-3. **Content** — the substantive discussion, structured into logical sections
+Extract information from whatever source material is available and compose the report.
 
 #### Content writing guidelines
 
 - Write in **plain text**, not HTML
 - Structure with numbered sections (1. Topic, 2. Topic, ...)
 - Use `- bullet points` for lists within sections
-- Use names when listing per-person notes (e.g., `- 이수민: ...`)
-- Cover: what was discussed, what advice was given, what action items were agreed
-- Be comprehensive but concise — capture the substance, skip filler conversation
-- Ignore speaker labels in transcriptions if they're inaccurate — focus on the content
+- Use full names when listing per-person notes (e.g., `- 이수민: ...`)
+- Cover: what was discussed, what was taught/advised, what action items were agreed
+- Be comprehensive but concise — capture the substance, not filler
 - `mentorOpinion` and `etc` fields: leave empty by default. Only fill if the user explicitly requests or there are genuine special notes worth recording
 
-#### Content structure template
+#### Content structure by session type
+
+**자유 멘토링 (MRC010)** — interactive small-group sessions:
 
 ```
-1. [First Topic]
+1. [Discussion Topic A]
 
-[Summary paragraph]
+[What was discussed, what questions were asked, what advice was given]
 
-- [Detail point]
-- [Detail point]
+- [Key point or per-person detail]
+- [Key point or per-person detail]
 
-2. [Second Topic]
+2. [Discussion Topic B]
 
-[Summary paragraph]
+[Summary of discussion]
 
-- [Per-person or per-item details]
+3. [Action Items / Next Steps]
 
-3. [Recommendations / Action Items]
+- [What was agreed]
+- [What to prepare for next session]
+```
 
-- [Action item 1]
-- [Action item 2]
+**멘토 특강 (MRC020)** — lecture/seminar format:
+
+```
+1. [Lecture Topic / Section]
+
+[What was taught, key concepts covered, examples demonstrated]
+
+- [Important takeaway]
+- [Important takeaway]
+
+2. [Hands-on / Demo Section] (if applicable)
+
+[What participants practiced, tools used, outcomes]
+
+3. [Q&A Summary] (if applicable)
+
+- [Question]: [Answer/discussion]
+- [Question]: [Answer/discussion]
 ```
 
 ### Step 4: Capture evidence PDF
@@ -158,8 +195,6 @@ agent-browser close
 ```
 
 ### Step 5: Submit the report
-
-Save the content to a temp file and submit:
 
 ```bash
 CONTENT=$(cat /tmp/report-content.txt)
