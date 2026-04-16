@@ -78,3 +78,7 @@ When asked to release without a specific version:
 - **Minor** (x.Y.0) — new features, new commands, new options, expanded capabilities
 
 Decide automatically based on commits since last release. Do not ask the user. Never bump major unless the user explicitly requests it. If the user specifies a version, use it as-is.
+
+## PR & Commit Messages
+
+Never use real names in PR titles, commit messages, or PR descriptions. Always use placeholders (e.g., `<name>`, `<user>`, `<author>`) if a name reference is needed.
