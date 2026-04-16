@@ -1,4 +1,4 @@
-import { BookOpen, GithubLogo, SignIn } from '@phosphor-icons/react/dist/ssr'
+import { BookOpen, GithubLogo } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -35,10 +35,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <ThemeToggle />
             <Link
               href="/login"
-              className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
+              className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
             >
-              <SignIn size={16} />
-              Sign in
+              로그인
             </Link>
           </div>
         </div>
