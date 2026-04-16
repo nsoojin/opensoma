@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
   applicationName: SITE_NAME,
   title: {
-    template: '%s | 오픈소마',
+    template: `%s | ${SITE_NAME}`,
     default: SITE_NAME,
   },
   description: SITE_DESCRIPTION,

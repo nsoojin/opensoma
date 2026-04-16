@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
+import { JsonLdScript } from '@/components/json-ld-script'
 import { extractHeadings, getAllDocSlugs, getDoc } from '@/lib/docs'
 import { SITE_DESCRIPTION, SITE_NAME, toAbsoluteUrl } from '@/lib/seo'
 
@@ -75,7 +76,7 @@ export default async function DocPage({ params }: PageProps) {
 
   return (
     <div className="flex gap-8">
-      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      <JsonLdScript data={jsonLd} />
       <article className="docs-prose min-w-0 flex-1">
         <h1>{doc.meta.title}</h1>
         {doc.meta.description && <p className="lead">{doc.meta.description}</p>}
