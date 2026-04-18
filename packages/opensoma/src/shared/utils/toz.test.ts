@@ -52,9 +52,12 @@ describe('formatStartTime / buildStartTimeParam', () => {
     expect(buildStartTimeParam('9:05')).toBe('0905')
   })
 
-  it('rejects invalid time', () => {
+  it('rejects time without colon separator', () => {
     expect(() => formatStartTime('1000')).toThrow()
-    expect(() => formatStartTime('25:00')).not.toThrow()
+  })
+
+  it('accepts out-of-range hours because the format matches', () => {
+    expect(formatStartTime('25:00')).toEqual({ hour: '25', minute: '00' })
   })
 })
 
@@ -120,13 +123,15 @@ describe('parseEmail', () => {
 })
 
 describe('assertDurationInRange', () => {
-  it('accepts 120-180', () => {
-    expect(() => assertDurationInRange(120)).not.toThrow()
-    expect(() => assertDurationInRange(150)).not.toThrow()
-    expect(() => assertDurationInRange(180)).not.toThrow()
+  it('accepts boundary and interior values', () => {
+    expect(assertDurationInRange(120)).toBeUndefined()
+    expect(assertDurationInRange(150)).toBeUndefined()
+    expect(assertDurationInRange(180)).toBeUndefined()
   })
 
-  it('rejects out-of-range', () => {
+  it('rejects values just outside the boundary', () => {
+    expect(() => assertDurationInRange(119)).toThrow()
+    expect(() => assertDurationInRange(181)).toThrow()
     expect(() => assertDurationInRange(60)).toThrow()
     expect(() => assertDurationInRange(210)).toThrow()
   })
